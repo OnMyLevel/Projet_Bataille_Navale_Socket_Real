@@ -12,17 +12,14 @@ public class Carte {
     private Random random = new Random();
 
     public void setNonC(String c){
-
         this.nomc=c;
     }
 
     public String getNomc(){
-
         return this.nomc;
     }
 
     public void setTabE(Object tab2[][]){
-
         this.tab=tab2;
 
     }
@@ -36,8 +33,6 @@ public class Carte {
         return   this.s;
     }
 
-
-
     public void  setElementT(Object a,Addresse b)
     {
         this.tab[b.getAdrLigne()][b.getAdrColone()]=a ;
@@ -45,9 +40,6 @@ public class Carte {
             ((Element) a).setAdresse(b);
         }
     }
-
-
-
 
     public Object getElementT(Addresse a ){
         Object b= new Object();
@@ -57,7 +49,6 @@ public class Carte {
         return b;
 
     }
-
 
     public Carte(){
 
@@ -144,13 +135,10 @@ public class Carte {
 
     }
 
-
-
     public static char intTochar(int i){
         String s =""+i;
         return s.charAt(0);
     }
-
 
     public void AfficheC3()
     {
@@ -224,7 +212,6 @@ public class Carte {
 
     public void SuprimerE(Addresse a){
         if ((a.getAdrLigne()>=0 && a.getAdrLigne()< (lignec)) && (a.getAdrColone()>=0 && a.getAdrColone()< (colonec) )){
-
             this.tab[a.getAdrLigne()][a.getAdrColone()]=s;
         }
     }
@@ -248,7 +235,6 @@ public class Carte {
     public int dice( int sides)throws NullPointerException{
         int total = 0;
         this.random= new Random();
-
         total = this.random.nextInt(sides) ;
         return total;
     }

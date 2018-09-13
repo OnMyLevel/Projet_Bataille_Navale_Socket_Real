@@ -1,12 +1,17 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class Flotte {
-    private Vector bateaux;
-    /** Creates a new instance of Flotte */
+
+    private static final int NOMBRE_BATEAU = 5;
+    private ArrayList<Bateau> compBateau;
+    private boolean flotteDet;
+
     public Flotte() {
-        bateaux=new Vector();
+        this.flotteDet = false;
+        this.compBateau = new ArrayList<>();
     }
 
 }
