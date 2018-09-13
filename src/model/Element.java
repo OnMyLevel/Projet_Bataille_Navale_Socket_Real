@@ -40,12 +40,12 @@ public class Element {
     public String toString() {
         String s;
         if(etat.compareTo("intact")==0){
-            s="#";
+            s=" # ";
         }else{
             if(etat=="abime"){
-                s="*";
+                s=" * ";
             }else{
-                s=".";
+                s=" . ";
             }
         }
         return s;

@@ -6,9 +6,9 @@ public class Carte {
 
     private String nomc;
     private Object  tab[][];
-    public static final int colonec =40;
+    public static final int colonec =10;
     public static final int lignec =10;
-    private String s=".";
+    private String s=" . ";
     private Random random = new Random();
 
     public void setNonC(String c){
@@ -72,23 +72,6 @@ public class Carte {
             }
         }
     }
-
-
-
-    public void  AfficheC1()
-    {   int i;
-        int j;
-
-        System.out.println(" Carte :"+this.getNomc());
-        for (i=0; i<Carte.lignec;i++){
-            for(j=0;j<Carte.colonec;j++){
-                System.out.println(this.tab[i][j].toString());
-            }
-            System.out.println("");
-        }
-    }
-
-
 
     public void IniCarte1()
     {
@@ -162,23 +145,10 @@ public class Carte {
     }
 
 
-    public void AfficheC2()
-    {
-        int i;
-        int j;
-        int m;
 
-
-        for(m=0 ; m<this.tab.length;m++){
-
-        }
-        for( i =0; i<this.tab.length;i++ ){
-            for( j = 0;j<this.tab[i].length;j++){
-                System.out.print(tab[i][j].toString()+" ");
-            }
-            System.out.println("");
-        }
-        System.out.println("");
+    public static char intTochar(int i){
+        String s =""+i;
+        return s.charAt(0);
     }
 
 
@@ -186,17 +156,20 @@ public class Carte {
     {
         int i;
         int j;
-        int m;
-
-
-
-        System.out.print("------------------------------------------\n");
-
+        System.out.print(" ");
+        for( i =0; i<this.tab.length;i++ ){
+            if(i== this.tab.length -1 ){
+                System.out.print(" "+intTochar(i)+" \n");
+            }
+            else{
+                System.out.print(" " + intTochar(i) + " ");
+            }
+        }
         for( i =0; i<this.tab.length;i++ ){
             for( j = 0;j<this.tab[i].length;j++){
                 if (j==0)
                 {
-                    System.out.print("|"+tab[i][j].toString());
+                    System.out.print(i+""+tab[i][j].toString());
                 }
                 else {
                     if (this.tab[i][j]==null){
@@ -207,11 +180,14 @@ public class Carte {
             }
             System.out.println("|");
         }
-
-        System.out.print("_________________________________________");
+        System.out.print(" ");
+        for( i =0; i<this.tab.length;i++ ){
+            System.out.print(" _ ");
+        }
         System.out.print("\n");
         System.out.print("\n");
     }
+
 
     public void PlacerE1(Element a){
         if ((a.getAdresse().getAdrLigne()>=0 && a.getAdresse().getAdrLigne()< (lignec)) &&
