@@ -1,13 +1,16 @@
 package model;
-import sun.jvm.hotspot.debugger.posix.elf.ELFException;
 
 import java.util.Random;
 public class Carte {
 
     private String nomc;
     private Object  tab[][];
-    public static final int colonec =10;
-    public static final int lignec =10;
+    public static final int TAILLECOLONNE =10;
+    public static final int TAILLELIGNE =10;
+
+    public static final Addresse EXBHORYSENTAL =new Addresse(0,9);
+    public static final Addresse EXAVERTICAL = new Addresse(9,1);
+
     private String s=" . ";
     private Random random = new Random();
 
@@ -44,7 +47,7 @@ public class Carte {
     public Object getElementT(Addresse a ){
         Object b= new Object();
 
-        if( (a.getAdrLigne()> 0 &&  a.getAdrLigne()<(lignec)) && (a.getAdrColone()>0 && a.getAdrColone()<(colonec)))
+        if( (a.getAdrLigne()> 0 &&  a.getAdrLigne()<(TAILLELIGNE)) && (a.getAdrColone()>0 && a.getAdrColone()<(TAILLECOLONNE)))
             b=this.tab[a.getAdrLigne()][a.getAdrColone()];
         return b;
 
@@ -52,47 +55,27 @@ public class Carte {
 
     public Carte(){
 
-        this.tab = new Object[lignec][colonec];
+        this.tab = new Object[TAILLELIGNE][TAILLECOLONNE];
         int i;
         int j;
 
-        for (i=0;i<Carte.lignec;i++){
-            for(j=0;j<Carte.colonec;j++){
+        for (i=0; i<Carte.TAILLELIGNE; i++){
+            for(j=0; j<Carte.TAILLECOLONNE; j++){
                 this.tab[i][j]=s;
 
             }
         }
     }
 
-    public void IniCarte1()
-    {
-        this.tab = new Object[lignec][];
-        int i;
-        int j;
 
-        for ( i =0; i<Carte.lignec;i++){
-
-            this.tab[i]=new Object[Carte.colonec];
-        }
-
-        for( i =0; i<Carte.lignec;i++ ){
-            for( j = 0;j<this.tab[i].length;j++){
-                this.tab[i][j]=s;
-
-
-            }
-        }
-        this.PlacerAle();
-        this.PlacerAle();
-    }
 
     public void PlacerAle(){
 
         int a;
         int b;
         int h;
-        a=dice(lignec);
-        b=dice(colonec);
+        a=dice(TAILLELIGNE);
+        b=dice(TAILLECOLONNE);
         h=dice(3);
 
 
@@ -103,17 +86,17 @@ public class Carte {
         if( h==2){
 
         }
-        this.PlacerE2(v, new Addresse(a,b));
+        this.PlacerElement2(v, new Addresse(a,b));
 
 
         if( h==0){
 
         }
-        this.PlacerE2(m, new Addresse(a,b));
+        this.PlacerElement2(m, new Addresse(a,b));
 
         if( h==1){
 
-            this.PlacerE2(s, new Addresse(a,b));
+            this.PlacerElement2(s, new Addresse(a,b));
 
         }
     }
@@ -125,13 +108,13 @@ public class Carte {
         Element m=  new Element();
         Element v=  new Element();
 
-        a=dice(lignec);
-        b=dice(colonec);
+        a=dice(TAILLELIGNE);
+        b=dice(TAILLECOLONNE);
 
-        this.PlacerE2(m, new Addresse(a,b));
-        this.PlacerE2(v, new Addresse(a,b));
-        a=dice(lignec);
-        b=dice(colonec);
+        this.PlacerElement2(m, new Addresse(a,b));
+        this.PlacerElement2(v, new Addresse(a,b));
+        a=dice(TAILLELIGNE);
+        b=dice(TAILLECOLONNE);
 
     }
 
@@ -177,30 +160,30 @@ public class Carte {
     }
 
 
-    public void PlacerE1(Element a){
-        if ((a.getAdresse().getAdrLigne()>=0 && a.getAdresse().getAdrLigne()< (lignec)) &&
-                (a.getAdresse().getAdrColone()>=0 && a.getAdresse().getAdrColone()< (colonec) )){
+    public void PlacerElement(Element a){
+        if ((a.getAdresse().getAdrLigne()>=0 && a.getAdresse().getAdrLigne()< (TAILLELIGNE)) &&
+                (a.getAdresse().getAdrColone()>=0 && a.getAdresse().getAdrColone()< (TAILLECOLONNE) )){
 
-            if ( this.tab[a.getAdresse().getAdrLigne()][a.getAdresse().getAdrColone()].toString()!="?"){
-                System.out.println("Occcuper! \n");
+            if ( this.tab[a.getAdresse().getAdrLigne()][a.getAdresse().getAdrColone()].toString() !=" . "){
+                System.out.println("Occcuper  \n");
             }
             else{
                 this.tab[a.getAdresse().getAdrLigne()][a.getAdresse().getAdrColone()]=a;
             }
         }
         else {
-            System.out.println("Eror d'Adresse!\n ");
+            System.out.println("Erreur d'Adresse!\n ");
+            System.out.println("8 \n");
         }
     }
 
-    public  void PlacerE2(Object v, Addresse b){
-        if ( (b.getAdrLigne()>=0 && b.getAdrLigne()< lignec) &&
-                (b.getAdrColone()>=0 && b.getAdrColone()< colonec ) &&
-                (this.tab[b.getAdrLigne()][b.getAdrColone()].toString()=="#")){
+    public  void PlacerElement2(Object v, Addresse b){
+        if ( (b.getAdrLigne()>=0 && b.getAdrLigne()< TAILLELIGNE) &&
+                (b.getAdrColone()>=0 && b.getAdrColone()< TAILLECOLONNE) &&
+                (this.tab[b.getAdrLigne()][b.getAdrColone()].toString() == "#")){
 
-            System.out.println("E\n ");
+            System.out.println("ELEMENT PLACER \n ");
         }
-
         else{
             this.tab[b.getAdrLigne()][b.getAdrColone()]=v;
             if (v instanceof  Element  ){
@@ -211,13 +194,13 @@ public class Carte {
 
 
     public void SuprimerE(Addresse a){
-        if ((a.getAdrLigne()>=0 && a.getAdrLigne()< (lignec)) && (a.getAdrColone()>=0 && a.getAdrColone()< (colonec) )){
+        if ((a.getAdrLigne()>=0 && a.getAdrLigne()< (TAILLELIGNE)) && (a.getAdrColone()>=0 && a.getAdrColone()< (TAILLECOLONNE) )){
             this.tab[a.getAdrLigne()][a.getAdrColone()]=s;
         }
     }
 
     public boolean caseValide(Addresse b){
-        if(b.getAdrLigne() >= 0 && b.getAdrLigne() < lignec && b.getAdrColone() >= 0 && b.getAdrColone() < colonec){
+        if(b.getAdrLigne() >= 0 && b.getAdrLigne() < TAILLELIGNE && b.getAdrColone() >= 0 && b.getAdrColone() < TAILLECOLONNE){
             return true;
         }
         else
@@ -251,11 +234,9 @@ public class Carte {
 		a = new  Carte();
 		a.setNonC("MERIL");
 		 int g=1;
-		 a.PlacerE2(v, h);
-		 a.PlacerE2(b,n);
-
+		 a.PlacerElement2(v, h);
+		 a.PlacerElement2(b,n);
 		 a.AfficheC3();
-
 
 	}
 
