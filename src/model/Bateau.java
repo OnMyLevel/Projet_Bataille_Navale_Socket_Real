@@ -1,19 +1,36 @@
 package model;
 
 public class Bateau {
-    private boolean horizontal;
+
     private Element[] element;
+    private boolean vertical;
+
+    public Element[] getElement() {
+        return element;
+    }
+
+    public void setElement(Element[] element) {
+        this.element = element;
+    }
+
+    public Bateau(){
+
+    }
+
     /** Creates a new instance of Bateau */
-    public Bateau(int x, int y, boolean h,int taille) {
-        horizontal=h;
+    public Bateau(int x, int y, int taille,boolean vertical) {
+        System.out.println("2-1 \n");
         element=new Element[taille];
-        if(horizontal){
-            for(int i=0;i<taille;i++){
-                element[i]=new Element(x+i,y);
+        this.vertical = vertical;
+        if(!vertical) {
+            for (int i = 0; i < taille; i++) {
+                System.out.println("2-1 \n");
+                element[i] = new Element(x, y + i);
             }
-        }else{
+        }
+        else{
             for(int i=0;i<taille;i++){
-                element[i]=new Element (x,y+i);
+                element[i]=new Element (x+i,y);
             }
         }
     }
@@ -31,15 +48,22 @@ public class Bateau {
         boolean res=true;
         int i=0;
         while((i<element.length)&&res){
-            res=(res)&&(element[i].getEtat()=="detruit");
+            res=(res)&&(element[i].getEtat() == "detruit");
             i++;
         }
         return res;
     }
     public String toString(){
-        String s="("+element[0].getabcisse()+","+element[0].getordonnee()+")";
-        for(int i=0;i<element.length;i++)
-            s+=element[i].toString();
+        String s=" nb block:" + this.getElement().length + "\n";
+        for(int i=0;i<element.length;i++) {
+            s += " "+element[i].toString()+" ";
+        }
+        s +="\n";
+        for(int i=0;i<element.length;i++) {
+            s += "|"+element[i].getabcisse()+","+element[i].getordonnee()+"|";
+        }
+        s +="\n";
         return s;
     }
+
 }

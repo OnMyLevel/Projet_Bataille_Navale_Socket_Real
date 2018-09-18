@@ -5,8 +5,8 @@ public class Element {
     private String etat;
 
     public Element(int i, int j) {
-        this.adr.setAdrLigne(i);
-        this.adr.setAdrColone(j);
+        System.out.println("2-1 \n");
+        this.adr = new Addresse(i,j);
         etat="intact";
     }
 
@@ -40,23 +40,23 @@ public class Element {
     public String toString() {
         String s;
         if(etat.compareTo("intact")==0){
-            s="#";
+            s=" # ";
         }else{
             if(etat=="abime"){
-                s="*";
+                s=" * ";
             }else{
-                s=".";
+                s=" . ";
             }
         }
         return s;
     }
 
-
     public void setAdresse(Addresse b) {
+
         this.adr = b;
     }
-
     public Addresse getAdresse() {
+
         return  this.adr;
     }
 
