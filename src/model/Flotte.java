@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.lang.Math;
 
 public class Flotte {
 
@@ -48,7 +49,8 @@ public class Flotte {
         return a;
     }
 
-    public void placeCroiseur(Addresse debut,boolean vertical){
+    public boolean placeCroiseur(Addresse debut,boolean vertical){
+        boolean bienFait = false;
         System.out.println(" Placement d'un bateau de type Croiseur");
        if(!debut.equal(this.maps.EXAVERTICAL) && !debut.equal(this.maps.EXBHORYSENTAL)
                && this.freePositioncCroiseurAlignement(debut,vertical,CROISEUR_TAILLE)){
@@ -62,17 +64,20 @@ public class Flotte {
                        }
                    }
                    this.compBateau.add(a);
+                   bienFait = true;
                }
            }
            else{
-               System.out.println("Impossible de placer un Croiseur à cette position 2");
+               System.out.println("Impossible de placer un Croiseur à cette position ");
            }
        }else{
            System.out.println("Impossible de placer un Croiseur à cette position ");
        }
+       return bienFait;
     }
 
-    public void placeCuirasse(Addresse debut,boolean vertical){
+    public boolean placeCuirasse(Addresse debut,boolean vertical){
+        boolean bienFait = false;
         System.out.println("Placement d'un bateau de type Cuirasse");
         if(!debut.equal(this.maps.EXAVERTICAL) && !debut.equal(this.maps.EXBHORYSENTAL)
                 && this.freePositioncCroiseurAlignement(debut,vertical,CUIRASSE_TAILLE)){
@@ -87,6 +92,7 @@ public class Flotte {
                         }
                     }
                     this.compBateau.add(a);
+                    bienFait = true;
                 }
             }
             else{
@@ -95,9 +101,11 @@ public class Flotte {
         }else{
             System.out.println("Impossible de placer un Cuirasse à cette position ");
         }
+       return bienFait;
     }
 
-    public void placePorteAvion(Addresse debut,boolean vertical){
+    public boolean placePorteAvion(Addresse debut,boolean vertical){
+        boolean bienFait = false;
         System.out.println("Placement d'un bateau de type PorteAvion");
         if(!debut.equal(this.maps.EXAVERTICAL) && !debut.equal(this.maps.EXBHORYSENTAL)
                 && this.freePositioncCroiseurAlignement(debut,vertical,PORTEAVIONS_TAILLE)){
@@ -112,17 +120,20 @@ public class Flotte {
                         }
                     }
                     this.compBateau.add(a);
+                    bienFait = true;
                 }
             }
             else{
-                System.out.println("Impossible de placer un PorteAvion à cette position  ");
+                System.out.println("Impossible de placer un PorteAvion à cette position ");
             }
         }else{
             System.out.println("Impossible de placer un PorteAvion à cette position ");
         }
+        return bienFait;
     }
 
-    public void placeTorpilleur(Addresse debut,boolean vertical){
+    public boolean placeTorpilleur(Addresse debut,boolean vertical){
+        boolean bienFait = false;
         System.out.println("Placement d'un bateau de type Torpilleur");
         if(!debut.equal(this.maps.EXAVERTICAL) && !debut.equal(this.maps.EXBHORYSENTAL)
                 && this.freePositioncCroiseurAlignement(debut,vertical,TORPILLEUR_TAILLE)){
@@ -137,18 +148,21 @@ public class Flotte {
                         }
                     }
                     this.compBateau.add(a);
+                    bienFait = true;
                 }
             }
             else{
-                System.out.println("Impossible de placer un Torpilleur à cette position  ");
+                System.out.println("Impossible de placer un Torpilleur à cette position ");
             }
         }else{
             System.out.println("Impossible de placer un Torpilleur à cette position ");
         }
+        return bienFait;
     }
 
 
-    public void placeSousmarin(Addresse debut,boolean vertical){
+    public boolean placeSousmarin(Addresse debut,boolean vertical){
+           boolean bienFait = false;
            System.out.println("Placement d'un bateau de type SousMarin");
             if(freePosition(debut.getAdrLigne(),debut.getAdrColone() + ( SOUSMARIN_TAILLE - debut.getAdrColone() ))){
                 SousMarin a = new SousMarin(debut.getAdrLigne(),debut.getAdrColone(), SOUSMARIN_TAILLE,vertical);
@@ -158,7 +172,12 @@ public class Flotte {
                     }
                 }
                 this.compBateau.add(a);
+                bienFait=true;
             }
+            else{
+                System.out.println("Impossible de placer un SousMarin à cette position ");
+            }
+            return bienFait;
     }
 
     public boolean AjouterBateau(Bateau ajouter){
@@ -170,20 +189,136 @@ public class Flotte {
         return  a;
     }
 
+    public boolean adrToucher(Addresse t){
+        boolean a= false;
+        for(int i=0;i<this.compBateau.size();i++){
+            for(int j=0;j<this.compBateau.get(i).getElement().length;j++){
+                if(this.compBateau.get(i).getElement()[j].touche(t.getAdrLigne(),t.getAdrColone())){
+                    System.out.println("Vous avez toucher l'adresse  "+t.toString()+"");
+                }
+                else {
+                    System.out.println("A l'eau sur la "+t.toString()+"");
+                }
+            }
+        }
+        this.bateauDetruit();
+        return a;
+    }
+
+    public void bateauDetruit() {
+        for (int i = 0; i < this.compBateau.size(); i++) {
+            if (this.compBateau.get(i).estdetruit()){
+               // this.compBateau.remove(i);
+                System.out.println("Le bateaut "+this.compBateau.get(i).getClass()+" a été détruit ");
+            }
+        }
+    }
+
+    public boolean placeAleSousMarin(){
+        boolean a=false;
+        int i= 0;
+        while(!a){
+            int x=(int) (Math.random() * 9 );
+            int y=(int) (Math.random() * 9);
+            int ale= (int) (Math.random() * 2);
+            System.out.println("Val ale :"+ale);
+            boolean vertical = false;
+            if(ale>0){
+                a = this.placeSousmarin(new Addresse(x,y),true);
+            }else{
+                a = this.placeSousmarin(new Addresse(x,y),false);
+            }
+        }
+        return a;
+    }
+
+    public boolean placeAlePorteAVion(){
+        boolean a=false;
+        int i= 0;
+        while(!a){
+            int x=(int) (Math.random() * 9 );
+            int y=(int) (Math.random() * 9);
+            int ale= (int) (Math.random() * 2);
+            System.out.println("Val ale :"+ale);
+            if(ale>0){
+                a = this.placePorteAvion(new Addresse(x,y),true);
+            }else{
+                a = this.placePorteAvion(new Addresse(x,y),false);
+            }
+        }
+        return a;
+    }
+
+    public boolean placeAleCroiseur(){
+        boolean a=false;
+        int i= 0;
+        while(!a){
+            int x=(int) (Math.random() * 9 );
+            int y=(int) (Math.random() * 9);
+            int ale= (int) (Math.random() * 2);
+            System.out.println("Val ale :"+ale);
+            if(ale>0){
+                a = this.placeCroiseur(new Addresse(x,y),true);
+            }else{
+                a = this.placeCroiseur(new Addresse(x,y),false);
+            }
+        }
+        return a;
+    }
+
+    public boolean placeAleTorpilleur(){
+        boolean a=false;
+        int i= 0;
+        while(!a){
+            int x=(int) (Math.random() * 9 );
+            int y=(int) (Math.random() * 9);
+            int ale= (int) (Math.random() * 2);
+            System.out.println("Val ale :"+ale);
+            boolean vertical = false;
+            if(ale>0){
+                a = this.placeTorpilleur(new Addresse(x,y),true);
+            }else{
+                a = this.placeTorpilleur(new Addresse(x,y),false);
+            }
+        }
+        return a;
+    }
+
+    public boolean placeAleCuirasse(){
+        boolean a=false;
+        int i= 0;
+        while(!a){
+            int x=(int) (Math.random() * 9 );
+            int y=(int) (Math.random() * 9);
+            int ale= (int) (Math.random() * 2);
+            System.out.println("Val ale :"+ale);
+            if(ale>0){
+                a = this.placeCuirasse(new Addresse(x,y),true);
+            }else{
+                a = this.placeCuirasse(new Addresse(x,y),false);
+            }
+        }
+        return a;
+    }
+
+    public boolean placeBateauAle(){
+        boolean a=false;
+        a = this.placeAleCroiseur();
+        a = this.placeAlePorteAVion();
+        a = this.placeAleSousMarin();
+        a = this.placeAleCuirasse();
+        a = this.placeAleTorpilleur();
+
+        return  a;
+    }
+
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         Flotte a= new Flotte();
 
-        a.maps.AfficheC3();
-        a.placeSousmarin( new Addresse(5,5),false);
-        a.maps.AfficheC3();
-        a.placeCroiseur(new Addresse(5,8), true);
-        a.maps.AfficheC3();
-        a.placeCuirasse(new Addresse(5,0), false);
-        a.maps.AfficheC3();
-        a.placePorteAvion(new Addresse(4,7), true);
-        a.maps.AfficheC3();
-        a.placeTorpilleur(new Addresse(1,5), false);
+        System.out.println(a.placeBateauAle());
+        //a.adrToucher(new Addresse(5,5));
+        //a.adrToucher(new Addresse(1,5));
         a.maps.AfficheC3();
 
         for(int i=0;i< a.compBateau.size();i++) {

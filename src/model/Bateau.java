@@ -32,25 +32,31 @@ public class Bateau {
             }
         }
     }
+
     public void avancer(int x,int y){
         for(int i=0;i<element.length;i++){
             element[i].avancer(x,y);
         }
     }
-    public void touche(int x, int y){
+
+    public boolean touche(int x, int y){
+        boolean a=false;
         for(int i=0;i<element.length;i++){
-            element[i].touche(x,y);
+            a=element[i].touche(x,y);
         }
+        return a;
     }
+
     public boolean estdetruit(){
         boolean res=true;
         int i=0;
         while((i<element.length)&&res){
-            res=(res)&&(element[i].getEtat() == "detruit");
+            res=(res)&&(element[i].getEtat() == "abime");
             i++;
         }
         return res;
     }
+
     public String toString(){
         String s="nb block:" + this.getElement().length + "\n";
         for(int i=0;i<element.length;i++) {
@@ -63,5 +69,7 @@ public class Bateau {
         s +="\n";
         return s;
     }
+
+
 
 }

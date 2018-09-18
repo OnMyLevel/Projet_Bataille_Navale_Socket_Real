@@ -15,18 +15,24 @@ public class Element {
     }
 
     public int getabcisse(){
+
         return this.adr.getAdrLigne();
     }
     public int getordonnee(){
+
         return this.adr.getAdrColone();
     }
-    public void touche(int i , int j) {
+    public boolean touche(int i , int j) {
+        boolean a= false;
         if(this.adr.getAdrLigne()==i && this.adr.getAdrColone()==j) {
             if(etat=="intact"){
                 etat="abime";
+                a=true;
             }else if(etat=="abime")
                 etat="detruit";
+                a=true;
         }
+        return a;
     }
     public void avancer(int i,int j){
         if((i>=-1) && (i<=1) && (j>=-1) && (j<=1)){
@@ -34,9 +40,16 @@ public class Element {
             this.adr.setAdrColone(this.adr.getAdrColone()+j);
         }
     }
+
     public String getEtat(){
+
         return etat;
     }
+
+    public void setEtat(String a){
+        etat=a;
+    }
+
     public String toString() {
         String s;
         if(etat.compareTo("intact")==0){
