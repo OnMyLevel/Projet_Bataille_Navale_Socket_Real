@@ -30,8 +30,6 @@ public class Carte {
         return this.tab;
     }
 
-
-
     public  String getS(){
         return   this.s;
     }

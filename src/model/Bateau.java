@@ -19,12 +19,10 @@ public class Bateau {
 
     /** Creates a new instance of Bateau */
     public Bateau(int x, int y, int taille,boolean vertical) {
-        System.out.println("2-1 \n");
         element=new Element[taille];
         this.vertical = vertical;
         if(!vertical) {
             for (int i = 0; i < taille; i++) {
-                System.out.println("2-1 \n");
                 element[i] = new Element(x, y + i);
             }
         }
@@ -54,9 +52,9 @@ public class Bateau {
         return res;
     }
     public String toString(){
-        String s=" nb block:" + this.getElement().length + "\n";
+        String s="nb block:" + this.getElement().length + "\n";
         for(int i=0;i<element.length;i++) {
-            s += " "+element[i].toString()+" ";
+            s += ""+element[i].toString()+"";
         }
         s +="\n";
         for(int i=0;i<element.length;i++) {

@@ -7,7 +7,7 @@ public class Cuirasse extends Bateau{
         super(x,y,taille,vertical);
     }
     public String toString(){
-        return "escorteur"+super.toString();
-    }
 
+        return "Cuirasse : "+super.toString();
+    }
 }
