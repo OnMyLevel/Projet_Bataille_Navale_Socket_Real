@@ -7,6 +7,6 @@ public class PorteAvion extends Bateau{
         super(x,y, taille, vertical);
     }
     public String toString(){
-        return "PorteAvion :"+super.toString();
+        return "Porte Avion :"+super.toString();
     }
 }

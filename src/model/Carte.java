@@ -67,7 +67,7 @@ public class Carte {
 
 
 
-    public void PlacerAle(){
+    public void placerAle(){
 
         int a;
         int b;
@@ -85,15 +85,10 @@ public class Carte {
 
         }
         this.PlacerElement2(v, new Addresse(a,b));
-
-
         if( h==0){
-
+            this.PlacerElement2(m, new Addresse(a,b));
         }
-        this.PlacerElement2(m, new Addresse(a,b));
-
         if( h==1){
-
             this.PlacerElement2(s, new Addresse(a,b));
 
         }
@@ -121,17 +116,20 @@ public class Carte {
         return s.charAt(0);
     }
 
-    public void AfficheC3()
-    {
+    public String afficheCarte(){
+        String s = new String();
         int i;
         int j;
         System.out.print(" ");
+        s+=" ";
         for( i =0; i<this.tab.length;i++ ){
             if(i== this.tab.length -1 ){
                 System.out.print(" "+intTochar(i)+" \n");
+                s+=" "+intTochar(i)+" \n";
             }
             else{
                 System.out.print(" " + intTochar(i) + " ");
+                s+=" " + intTochar(i) + " ";
             }
         }
         for( i =0; i<this.tab.length;i++ ){
@@ -139,22 +137,32 @@ public class Carte {
                 if (j==0)
                 {
                     System.out.print(i+""+tab[i][j].toString());
+                    s+=i+""+tab[i][j].toString();
                 }
                 else {
                     if (this.tab[i][j]==null){
                         System.out.print(tab[i][j].toString());
+                        s+=tab[i][j].toString();
                     }
                     System.out.print(tab[i][j].toString());
+                    s+=tab[i][j].toString();
                 }
             }
             System.out.println("|");
+            s+="|";
         }
         System.out.print(" ");
+        s+=" ";
         for( i =0; i<this.tab.length;i++ ){
             System.out.print(" _ ");
+            s+=" _ ";
         }
         System.out.print("\n");
+        s+="\n";
         System.out.print("\n");
+        s+="\n";
+
+        return s;
     }
 
 
@@ -234,7 +242,7 @@ public class Carte {
         int g=1;
         a.PlacerElement2(v, h);
         a.PlacerElement2(b,n);
-        a.AfficheC3();
+        a.afficheCarte();
 
     }
 

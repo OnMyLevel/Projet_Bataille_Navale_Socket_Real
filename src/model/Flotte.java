@@ -141,7 +141,7 @@ public class Flotte {
                     (vertical == true && TORPILLEUR_TAILLE <= this.maps.TAILLELIGNE - debut.getAdrLigne())  ){
 
                 if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (TORPILLEUR_TAILLE - debut.getAdrColone()))) {
-                    PorteAvion a = new PorteAvion(debut.getAdrLigne(), debut.getAdrColone(),TORPILLEUR_TAILLE, vertical);
+                    Torpilleur a = new Torpilleur(debut.getAdrLigne(), debut.getAdrColone(),TORPILLEUR_TAILLE, vertical);
                     for (int i = 0; i < a.getElement().length; i++) {
                         if (a.getElement()[i] != null) {
                             this.maps.PlacerElement(a.getElement()[i]);
@@ -308,8 +308,23 @@ public class Flotte {
         a = this.placeAleSousMarin();
         a = this.placeAleCuirasse();
         a = this.placeAleTorpilleur();
-
         return  a;
+    }
+
+    public boolean finDeLaFlotte(){
+        return this.compBateau.isEmpty();
+    }
+
+    public String afficheFlotte(){
+        String s = new String();
+        for(int i=0;i< this.compBateau.size();i++) {
+            s+= this.compBateau.get(i).toString();
+            System.out.println(this.compBateau.get(i).toString());
+        }
+        return s;
+    }
+    public String afficheCarte(){
+        return this.maps.afficheCarte();
     }
 
     public static void main(String[] args) {
@@ -317,12 +332,8 @@ public class Flotte {
         Flotte a= new Flotte();
 
         System.out.println(a.placeBateauAle());
-        //a.adrToucher(new Addresse(5,5));
-        //a.adrToucher(new Addresse(1,5));
-        a.maps.AfficheC3();
-
-        for(int i=0;i< a.compBateau.size();i++) {
-            System.out.println(a.compBateau.get(i).toString());
-        }
+       // a.maps.afficheCarte();
+        a.afficheCarte();
+        a.afficheFlotte();
     }
 }

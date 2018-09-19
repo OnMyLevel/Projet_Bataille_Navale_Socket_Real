@@ -9,6 +9,6 @@ public class Croiseur extends Bateau {
     }
     public String toString(){
 
-        return "croiseur"+super.toString();
+        return "Croiseur "+super.toString();
     }
 }
