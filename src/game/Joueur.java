@@ -5,6 +5,22 @@ public class Joueur {
     private  String login;
     private  String password;
     private  int score;
+    private int idGame;
+
+    public Joueur(String login, String password, int score, int idGame) {
+        this.login = login;
+        this.password = password;
+        this.score = score;
+        this.idGame = idGame;
+    }
+
+    public int getIdGame() {
+        return idGame;
+    }
+
+    public void setIdGame(int idGame) {
+        this.idGame = idGame;
+    }
 
     @Override
     public String toString() {

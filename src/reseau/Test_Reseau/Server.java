@@ -1,12 +1,14 @@
 package reseau.Test_Reseau;
 
 
+import game.Game;
+import model.Carte;
+
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-// the server that can be run as a console
 public class Server {
     // a unique ID for each connection
     private static int uniqueId;
@@ -20,6 +22,7 @@ public class Server {
     private boolean keepGoing;
     // notification
     private String notif = " *** ";
+    private Game mainGame;
 
     //constructor that receive the port to listen to for connection as parameter
 
@@ -54,8 +57,9 @@ public class Server {
                 ClientThread t = new ClientThread(socket);
                 //add this client to arraylist
                 al.add(t);
-
-                t.start();
+                //if(al.size()==2){
+                    t.start();
+                //}
             }
             // try to stop the server
             try {
@@ -193,7 +197,7 @@ public class Server {
      */
     public static void main(String[] args) {
         // start server on port 1500 unless a PortNumber is specified
-        int portNumber = 81;
+        int portNumber = 1500;
         switch(args.length) {
             case 1:
                 try {
@@ -222,6 +226,7 @@ public class Server {
         Socket socket;
         ObjectInputStream sInput;
         ObjectOutputStream sOutput;
+        //PrintWriter pw = new PrintWriter(sOutput,true);
         // my unique id (easier for deconnection)
         int id;
         // the Username of the Client
@@ -281,6 +286,40 @@ public class Server {
                 }
                 // get the message from the ChatMessage object received
                 String message = cm.getMessage();
+                /*if(ChatMessage.MESSAGE){
+                    boolean confirmation =  broadcast(username + ": " + message);
+                    if(confirmation==false){
+                        String msg = notif + "Sorry. No such user exists." + notif;
+                        writeMsg(msg);
+                        display(msg);
+                    }
+                }
+                else if (message.equals("LOGOUT")){
+                    writeMsg(username + " disconnected with a LOGOUT message.");
+                    keepGoing = false;
+                }
+                else if (message.equals("JOUER")){
+                    System.out.println("vous avez ecrit:"+ message);
+                    writeMsg("Voulez vous commencer a jouer ?");
+
+                    if(message.equals("YES")){
+                        writeMsg("Ok, le jeu va commencer");
+                        if (message.equalsIgnoreCase("CARTE")){
+                            writeMsg("Voici la carte");
+                        }
+                    }
+                }
+                else if (message.equals("WHOISIN")){
+                    writeMsg("List of the users connected at " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for(int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i+1) + ") " + ct.username + " since " + ct.date);
+                    }
+                }
+                else if (message.equalsIgnoreCase("CARTE")){
+
+                }*/
 
                 // different actions based on type message
                 switch(cm.getType()) {
@@ -304,7 +343,46 @@ public class Server {
                             writeMsg((i+1) + ") " + ct.username + " since " + ct.date);
                         }
                         break;
+                    case ChatMessage.JOUER:
+                        writeMsg("Voulez vous commencer a jouer ?");
+                        writeMsg("je suis dans jouer");
+
+                        try {
+                            cm = (ChatMessage) sInput.readObject();
+                        }
+                        catch (IOException e) {
+                            display(username + " Exception reading Streams: " + e);
+                            break;
+                        }
+                        catch(ClassNotFoundException e2) {
+                            break;
+                        }
+
+                        switch (cm.getType()){
+                            case ChatMessage.YES:
+                                writeMsg("Ok, le jeu va commencer");
+                                mainGame.partie();
+
+                                /*try {
+                                    cm = (ChatMessage) sInput.readObject();
+                                }
+                                catch (IOException e) {
+                                    display(username + " Exception reading Streams: " + e);
+                                    break;
+                                }
+                                catch(ClassNotFoundException e2) {
+                                    break;
+                                }
+
+                                switch (cm.getType()){
+                                    case ChatMessage.CARTE:
+                                }*/
+
+                                break;
+                        }
+                        break;
                 }
+
             }
             // if out of the loop then disconnected and remove from client list
             remove(id);
@@ -327,6 +405,23 @@ public class Server {
             catch (Exception e) {}
         }
 
+
+        private boolean pw(ObjectOutputStream mssg){
+            if(!socket.isConnected()) {
+                close();
+                return false;
+            }
+            // write the message to the stream
+            try {
+                sOutput.writeObject(mssg);
+            }
+            // if an error occurs, do not abort just inform the user
+            catch(IOException e) {
+                display(notif + "Error sending message to " + username + notif);
+                display(e.toString());
+            }
+            return true;
+        }
         // write a String to the Client output stream
         private boolean writeMsg(String msg) {
             // if Client is still connected send the message to it

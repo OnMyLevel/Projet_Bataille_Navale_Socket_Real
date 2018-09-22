@@ -127,7 +127,7 @@ public class Client  {
      */
     public static void main(String[] args) {
         // default values if not entered
-        int portNumber = 81;
+        int portNumber = 1500;
         String serverAddress = "127.0.0.1";
         String userName = "Anonymous";
         Scanner scan = new Scanner(System.in);
@@ -168,11 +168,6 @@ public class Client  {
             return;
 
         System.out.println("\nHello.! Welcome to the chatroom.");
-        System.out.println("Instructions:");
-        System.out.println("1. Simply type the message to send broadcast to all active clients");
-        System.out.println("2. Type '@username<space>yourmessage' without quotes to send message to desired client");
-        System.out.println("3. Type 'WHOISIN' without quotes to see list of active clients");
-        System.out.println("4. Type 'LOGOUT' without quotes to logoff from server");
 
         // infinite loop to get the input from the user
         while(true) {
@@ -180,13 +175,29 @@ public class Client  {
             // read message from user
             String msg = scan.nextLine();
             // logout if message is LOGOUT
-            if(msg.equalsIgnoreCase("LOGOUT")) {
+            if(msg.equalsIgnoreCase("instruction")){
+                System.out.println("Instructions:");
+                System.out.println("1. Simply type the message to send broadcast to all active clients");
+                System.out.println("2. Type '@username<space>yourmessage' without quotes to send message to desired client");
+                System.out.println("3. Type 'WHOISIN' without quotes to see list of active clients");
+                System.out.println("4. Type 'LOGOUT' without quotes to logoff from server");
+            }
+            else if(msg.equalsIgnoreCase("LOGOUT")) {
                 client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
                 break;
             }
             // message to check who are present in chatroom
             else if(msg.equalsIgnoreCase("WHOISIN")) {
                 client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
+            }
+            else if(msg.equalsIgnoreCase("JOUER")) {
+                client.sendMessage(new ChatMessage(ChatMessage.JOUER, ""));
+            }
+            else if(msg.equalsIgnoreCase("YES")){
+                    client.sendMessage(new ChatMessage(ChatMessage.YES,""));
+            }
+            else if(msg.equalsIgnoreCase("CARTE")){
+                client.sendMessage(new ChatMessage(ChatMessage.CARTE,""));
             }
             // regular text message
             else {
