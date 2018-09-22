@@ -1,5 +1,7 @@
 package model;
 
+import com.sun.org.apache.xalan.internal.xsltc.dom.AdaptiveResultTreeImpl;
+
 public class Bateau {
 
     private Element[] element;
@@ -39,10 +41,10 @@ public class Bateau {
         }
     }
 
-    public boolean touche(int x, int y){
+    public boolean touche(Addresse b){
         boolean a=false;
         for(int i=0;i<element.length;i++){
-            a=element[i].touche(x,y);
+            a=element[i].toucheR(b);
         }
         return a;
     }

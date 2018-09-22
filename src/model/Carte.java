@@ -187,7 +187,6 @@ public class Carte {
         if ( (b.getAdrLigne()>=0 && b.getAdrLigne()< TAILLELIGNE) &&
                 (b.getAdrColone()>=0 && b.getAdrColone()< TAILLECOLONNE) &&
                 (this.tab[b.getAdrLigne()][b.getAdrColone()].toString() == "#")){
-
             System.out.println("ELEMENT PLACER \n ");
         }
         else{
@@ -238,7 +237,7 @@ public class Carte {
         Addresse h= new Addresse(7,9);
 
         a = new  Carte();
-        a.setNonC("MERIL");
+        a.setNonC("GRAND LINE");
         int g=1;
         a.PlacerElement2(v, h);
         a.PlacerElement2(b,n);

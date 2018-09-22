@@ -1,15 +1,19 @@
 package model;
 
+import java.util.Objects;
+
 public class Addresse {
 
     private int ligne;
     private int colone;
 
     public int getAdrColone() {
+
         return this.colone;
     }
 
     public void setAdrColone(int a) {
+
         this.colone = a;
     }
 
@@ -18,6 +22,7 @@ public class Addresse {
     }
 
     public void setAdrLigne(int b) {
+
         this.ligne = b;
     }
 
@@ -37,11 +42,9 @@ public class Addresse {
     }
 
     public boolean equal(Addresse a) {
-
-        if (this.ligne == a.getAdrLigne() && this.colone == a.getAdrColone()) {
+        if (this.ligne == a.ligne && this.colone == a.colone) {
             return true;
         }
-
         return false;
     }
 

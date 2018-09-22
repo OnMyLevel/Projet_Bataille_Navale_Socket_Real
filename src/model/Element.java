@@ -5,7 +5,6 @@ public class Element {
     private String etat;
 
     public Element(int i, int j) {
-        System.out.println("2-1 \n");
         this.adr = new Addresse(i,j);
         etat="intact";
     }
@@ -22,9 +21,9 @@ public class Element {
 
         return this.adr.getAdrColone();
     }
-    public boolean touche(int i , int j) {
+    public boolean toucheR(Addresse b) {
         boolean a= false;
-        if(this.adr.getAdrLigne()==i && this.adr.getAdrColone()==j) {
+        if(this.adr.equal(b)) {
             if(etat=="intact"){
                 etat="abime";
                 a=true;
@@ -58,7 +57,7 @@ public class Element {
             if(etat=="abime"){
                 s=" * ";
             }else{
-                s=" . ";
+                s="*";
             }
         }
         return s;

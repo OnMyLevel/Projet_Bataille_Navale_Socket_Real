@@ -14,9 +14,9 @@ public class SousMarin extends Bateau {
 
         super.avancer(x, y);
     }
-    public boolean touche(int x, int y){
+    public boolean touche(Addresse b){
         boolean a=false;
-        a= super.touche(x,y);
+        a= super.touche(b);
        return  a;
     }
     public String toString(){
