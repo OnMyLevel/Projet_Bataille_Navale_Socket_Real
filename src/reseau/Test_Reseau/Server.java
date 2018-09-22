@@ -361,6 +361,7 @@ public class Server {
                         switch (cm.getType()){
                             case ChatMessage.YES:
                                 writeMsg("Ok, le jeu va commencer");
+                                mainGame = new Game();
                                 mainGame.partie();
 
                                 /*try {
