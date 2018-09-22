@@ -193,7 +193,7 @@ public class Client  {
             else if(msg.equalsIgnoreCase("JOUER")) {
                 client.sendMessage(new ChatMessage(ChatMessage.JOUER, ""));
             }
-            else if(msg.equalsIgnoreCase("YES")){
+            else if(msg.equalsIgnoreCase("OUI")){
                     client.sendMessage(new ChatMessage(ChatMessage.YES,""));
             }
             else if(msg.equalsIgnoreCase("CARTE")){

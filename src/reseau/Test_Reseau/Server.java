@@ -345,8 +345,6 @@ public class Server {
                         break;
                     case ChatMessage.JOUER:
                         writeMsg("Voulez vous commencer a jouer ?");
-                        writeMsg("je suis dans jouer");
-
                         try {
                             cm = (ChatMessage) sInput.readObject();
                         }
