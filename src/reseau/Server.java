@@ -1,4 +1,4 @@
-package reseau.Test_Reseau;
+package reseau;
 
 
 import game.Game;
@@ -33,6 +33,7 @@ public class Server {
         sdf = new SimpleDateFormat("HH:mm:ss");
         // an ArrayList to keep the list of the Client
         al = new ArrayList<ClientThread>();
+        mainGame = new Game();
     }
 
     public void start() {
@@ -57,9 +58,24 @@ public class Server {
                 ClientThread t = new ClientThread(socket);
                 //add this client to arraylist
                 al.add(t);
-                //if(al.size()==2){
+                System.out.println(al.size());
+                t.start();
+                if(al.size()==2){
+                    display("Nous sommes au complet, le jeu va pouvoir commencer, voici la carte\n ");
+                    //ObjectOutputStream os = (ObjectOutputStream) socket.getOutputStream();
+                    //PrintWriter pw = new PrintWriter(os,true);
+                    //pw.println("Nous sommes au complet, le jeu va pouvoir commencer");
+                    Carte carte = new Carte();
+                    carte.afficheCarte();
+                    mainGame.partie();
+                    socket = serverSocket.accept();
+                    if(!keepGoing)
+                        break;
+                    // if client is connected, create its thread
+                    t = new ClientThread(socket);
                     t.start();
-                //}
+                }
+
             }
             // try to stop the server
             try {
@@ -110,7 +126,7 @@ public class Server {
         // to check if message is private i.e. client to client message
         String[] w = message.split(" ",3);
 
-        boolean isPrivate = false;
+        /*boolean isPrivate = false;
         if(w[1].charAt(0)=='@')
             isPrivate=true;
 
@@ -148,10 +164,11 @@ public class Server {
             {
                 return false;
             }
-        }
+        }*/
+
         // if message is a broadcast message
-        else
-        {
+        //else
+        //{
             String messageLf = time + " " + message + "\n";
             // display message
             System.out.print(messageLf);
@@ -166,7 +183,7 @@ public class Server {
                     display("Disconnected Client " + ct.username + " removed from list.");
                 }
             }
-        }
+        //}
         return true;
 
 
@@ -271,6 +288,9 @@ public class Server {
         // infinite loop to read and forward message
         public void run() {
             // to loop until LOGOUT
+            if(al.size()==2) {
+                broadcast("Nous sommes au complet, nous pouvons commencer le jeu");
+            }
             boolean keepGoing = true;
             while(keepGoing) {
                 // read a String (which is an object)
@@ -286,51 +306,17 @@ public class Server {
                 }
                 // get the message from the ChatMessage object received
                 String message = cm.getMessage();
-                /*if(ChatMessage.MESSAGE){
-                    boolean confirmation =  broadcast(username + ": " + message);
-                    if(confirmation==false){
-                        String msg = notif + "Sorry. No such user exists." + notif;
-                        writeMsg(msg);
-                        display(msg);
-                    }
-                }
-                else if (message.equals("LOGOUT")){
-                    writeMsg(username + " disconnected with a LOGOUT message.");
-                    keepGoing = false;
-                }
-                else if (message.equals("JOUER")){
-                    System.out.println("vous avez ecrit:"+ message);
-                    writeMsg("Voulez vous commencer a jouer ?");
-
-                    if(message.equals("YES")){
-                        writeMsg("Ok, le jeu va commencer");
-                        if (message.equalsIgnoreCase("CARTE")){
-                            writeMsg("Voici la carte");
-                        }
-                    }
-                }
-                else if (message.equals("WHOISIN")){
-                    writeMsg("List of the users connected at " + sdf.format(new Date()) + "\n");
-                    // send list of active clients
-                    for(int i = 0; i < al.size(); ++i) {
-                        ClientThread ct = al.get(i);
-                        writeMsg((i+1) + ") " + ct.username + " since " + ct.date);
-                    }
-                }
-                else if (message.equalsIgnoreCase("CARTE")){
-
-                }*/
 
                 // different actions based on type message
                 switch(cm.getType()) {
 
                     case ChatMessage.MESSAGE:
-                        boolean confirmation =  broadcast(username + ": " + message);
-                        if(confirmation==false){
-                            String msg = notif + "Sorry. No such user exists." + notif;
-                            writeMsg(msg);
-                        }
-                        break;
+                    boolean confirmation =  broadcast(username + ": " + message);
+                    if(confirmation==false){
+                    String msg = notif + "Sorry. No such user exists." + notif;
+                    writeMsg(msg);
+                    }
+                    break;
                     case ChatMessage.LOGOUT:
                         display(username + " disconnected with a LOGOUT message.");
                         keepGoing = false;
@@ -359,7 +345,6 @@ public class Server {
                         switch (cm.getType()){
                             case ChatMessage.YES:
                                 writeMsg("Ok, le jeu va commencer");
-                                mainGame = new Game();
                                 mainGame.partie();
 
                                 /*try {
@@ -404,23 +389,6 @@ public class Server {
             catch (Exception e) {}
         }
 
-
-        private boolean pw(ObjectOutputStream mssg){
-            if(!socket.isConnected()) {
-                close();
-                return false;
-            }
-            // write the message to the stream
-            try {
-                sOutput.writeObject(mssg);
-            }
-            // if an error occurs, do not abort just inform the user
-            catch(IOException e) {
-                display(notif + "Error sending message to " + username + notif);
-                display(e.toString());
-            }
-            return true;
-        }
         // write a String to the Client output stream
         private boolean writeMsg(String msg) {
             // if Client is still connected send the message to it

@@ -1,4 +1,4 @@
-package reseau.Test_Reseau;
+package reseau;
 
 
 import java.io.*;

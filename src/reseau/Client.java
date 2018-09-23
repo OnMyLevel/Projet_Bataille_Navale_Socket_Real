@@ -1,4 +1,4 @@
-package reseau.Test_Reseau;
+package reseau;
 
 
 import java.net.*;
@@ -125,6 +125,17 @@ public class Client  {
      * If the serverAddress is not specified "localHost" is used
      * If the username is not specified "Anonymous" is used
      */
+
+    void getMessage (){
+        try {
+            sInput.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return;
+    }
     public static void main(String[] args) {
         // default values if not entered
         int portNumber = 1500;
@@ -168,6 +179,7 @@ public class Client  {
             return;
 
         System.out.println("\nHello.! Welcome to the chatroom.");
+        //client.getMessage();
 
         // infinite loop to get the input from the user
         while(true) {
@@ -178,9 +190,9 @@ public class Client  {
             if(msg.equalsIgnoreCase("instruction")){
                 System.out.println("Instructions:");
                 System.out.println("1. Simply type the message to send broadcast to all active clients");
-                System.out.println("2. Type '@username<space>yourmessage' without quotes to send message to desired client");
-                System.out.println("3. Type 'WHOISIN' without quotes to see list of active clients");
-                System.out.println("4. Type 'LOGOUT' without quotes to logoff from server");
+                System.out.println("2. Type 'WHOISIN' without quotes to see list of active clients");
+                System.out.println("3. Type 'LOGOUT' without quotes to logoff from server");
+                System.out.println("4. Type 'JOUER' without quotes to Start games");
             }
             else if(msg.equalsIgnoreCase("LOGOUT")) {
                 client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
