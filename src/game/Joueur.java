@@ -1,5 +1,9 @@
 package game;
 
+import model.Addresse;
+
+import java.util.Scanner;
+
 public class Joueur {
 
     private  String login;
@@ -49,10 +53,12 @@ public class Joueur {
     }
 
     public void setLogin(String login) {
+
         this.login = login;
     }
 
     public String getPassword() {
+
         return password;
     }
 
@@ -66,5 +72,16 @@ public class Joueur {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public Addresse lanceAttaque(){
+        int x=0;
+        int y=0;
+        Scanner sc = new Scanner(System.in);
+        System.out.println(" Rentrez l'abcisse. \n ");
+        x = sc.nextInt();
+        System.out.println(" Rentrez l'ordonée.\n ");
+        y = sc.nextInt();
+        return  new Addresse(x,y);
     }
 }

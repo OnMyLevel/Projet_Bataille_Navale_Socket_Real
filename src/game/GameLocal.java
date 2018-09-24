@@ -18,22 +18,27 @@ public class GameLocal {
     }
 
     public void setSimplJoueur(Joueur simplJoueur) {
+
         this.simplJoueur = simplJoueur;
     }
 
     public Flotte getFlotte() {
+
         return flotte;
     }
 
     public void setFlotte(Flotte flotte) {
+
         this.flotte = flotte;
     }
 
     public int getScore() {
+
         return score;
     }
 
     public void setScore(int score) {
+
         this.score = score;
     }
 
@@ -55,6 +60,7 @@ public class GameLocal {
     }
 
     public boolean placeAle(){
+
         return this.getFlotte().placeBateauAle();
     }
 
@@ -69,7 +75,7 @@ public class GameLocal {
         return  new Addresse(x,y);
     }
 
-    public boolean lanceAttaque(){
+    public boolean lanceAttaque() {
         return this.flotte.adrToucher(this.recupAdr());
     }
 
