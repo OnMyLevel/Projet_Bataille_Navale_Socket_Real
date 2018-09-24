@@ -2,6 +2,8 @@ package game;
 
 import model.Addresse;
 import model.Flotte;
+import reseau.Server;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -249,11 +251,16 @@ public class Game {
     }
 
     public void infoGame(){
+
         System.out.println("Actuellement \n ");
         System.out.println(this.getJoueurs().toString());
         System.out.println("Il reste : " + this.getFlotte().getNombreBateau() + " Bateaux");
         System.out.println(this.getFlotte().afficheFlotte().toString());
         this.flotte.afficheCarte();
+        /*String a = (" Actuellement\n "
+                + "Il reste : "+this.getFlotte().getNombreBateau() + " Bateaux \n");
+
+        return a;*/
     }
 
 

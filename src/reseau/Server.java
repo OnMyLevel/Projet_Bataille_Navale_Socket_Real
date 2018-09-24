@@ -3,6 +3,7 @@ package reseau;
 
 import game.Game;
 import model.Carte;
+import model.Flotte;
 
 import java.io.*;
 import java.net.*;
@@ -47,32 +48,49 @@ public class Server {
             // infinite loop to wait for connections ( till server is active )
             while(keepGoing)
             {
-                display("Server waiting for Clients on port " + port + ".");
-
-                // accept connection if requested from client
-                Socket socket = serverSocket.accept();
-                // break if server stoped
-                if(!keepGoing)
-                    break;
-                // if client is connected, create its thread
-                ClientThread t = new ClientThread(socket);
-                //add this client to arraylist
-                al.add(t);
-                System.out.println(al.size());
-                t.start();
+                if(al.size()<2) {
+                    display("Server waiting for Clients on port " + port + ".");
+                    // accept connection if requested from client
+                    Socket socket = serverSocket.accept();
+                    // break if server stoped
+                    if (!keepGoing)
+                        break;
+                    // if client is connected, create its thread
+                    ClientThread t = new ClientThread(socket);
+                    //add this client to arraylist
+                    al.add(t);
+                    System.out.println(al.size());
+                    t.start();
+                }
                 if(al.size()==2){
-                    display("Nous sommes au complet, le jeu va pouvoir commencer, voici la carte\n ");
-                    //ObjectOutputStream os = (ObjectOutputStream) socket.getOutputStream();
-                    //PrintWriter pw = new PrintWriter(os,true);
-                    //pw.println("Nous sommes au complet, le jeu va pouvoir commencer");
-                    Carte carte = new Carte();
-                    carte.afficheCarte();
+                    broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
+                    broadcast("Le jeu commencera dans 3...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    broadcast("2...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    broadcast("1...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    broadcast("--- START ---");
+
                     mainGame.partie();
-                    socket = serverSocket.accept();
+                    mainGame.infoGame();
+                    Socket socket = serverSocket.accept();
                     if(!keepGoing)
                         break;
                     // if client is connected, create its thread
-                    t = new ClientThread(socket);
+                    ClientThread t = new ClientThread(socket);
                     t.start();
                 }
 
@@ -103,7 +121,7 @@ public class Server {
     }
 
     // to stop the server
-    protected void stop() {
+    public  void stop() {
         keepGoing = false;
         try {
             new Socket("127.0.0.1", port);
@@ -113,84 +131,40 @@ public class Server {
     }
 
     // Display an event to the console
-    private void display(String msg) {
+    public void display(String msg) {
         String time = sdf.format(new Date()) + " " + msg;
         System.out.println(time);
     }
 
     // to broadcast a message to all Clients
-    private synchronized boolean broadcast(String message) {
+    public synchronized boolean broadcast(String message) {
         // add timestamp to the message
         String time = sdf.format(new Date());
 
         // to check if message is private i.e. client to client message
         String[] w = message.split(" ",3);
 
-        /*boolean isPrivate = false;
-        if(w[1].charAt(0)=='@')
-            isPrivate=true;
+        String messageLf = time + " " + message + "\n";
+        // display message
+        System.out.print(messageLf);
 
-
-        // if private message, send message to mentioned username only
-        if(isPrivate==true)
-        {
-            String tocheck=w[1].substring(1, w[1].length());
-
-            message=w[0]+w[2];
-            String messageLf = time + " " + message + "\n";
-            boolean found=false;
-            // we loop in reverse order to find the mentioned username
-            for(int y=al.size(); --y>=0;)
-            {
-                ClientThread ct1=al.get(y);
-                String check=ct1.getUsername();
-                if(check.equals(tocheck))
-                {
-                    // try to write to the Client if it fails remove it from the list
-                    if(!ct1.writeMsg(messageLf)) {
-                        al.remove(y);
-                        display("Disconnected Client " + ct1.username + " removed from list.");
-                    }
-                    // username found and delivered the message
-                    found=true;
-                    break;
-                }
-
-
-
+        // we loop in reverse order in case we would have to remove a Client
+        // because it has disconnected
+        for(int i = al.size(); --i >= 0;) {
+            ClientThread ct = al.get(i);
+            // try to write to the Client if it fails remove it from the list
+            if(!ct.writeMsg(messageLf)) {
+                al.remove(i);
+                display("Disconnected Client " + ct.username + " removed from list.");
             }
-            // mentioned user not found, return false
-            if(found!=true)
-            {
-                return false;
-            }
-        }*/
-
-        // if message is a broadcast message
-        //else
-        //{
-            String messageLf = time + " " + message + "\n";
-            // display message
-            System.out.print(messageLf);
-
-            // we loop in reverse order in case we would have to remove a Client
-            // because it has disconnected
-            for(int i = al.size(); --i >= 0;) {
-                ClientThread ct = al.get(i);
-                // try to write to the Client if it fails remove it from the list
-                if(!ct.writeMsg(messageLf)) {
-                    al.remove(i);
-                    display("Disconnected Client " + ct.username + " removed from list.");
-                }
-            }
-        //}
+        }
         return true;
 
 
     }
 
     // if client sent LOGOUT message to exit
-    synchronized void remove(int id) {
+    public synchronized void remove(int id) {
 
         String disconnectedClient = "";
         // scan the array list until we found the Id
@@ -238,7 +212,7 @@ public class Server {
     }
 
     // One instance of this thread will run for each client
-    class ClientThread extends Thread {
+    public class ClientThread extends Thread {
         // the socket to get messages from client
         Socket socket;
         ObjectInputStream sInput;
@@ -288,9 +262,14 @@ public class Server {
         // infinite loop to read and forward message
         public void run() {
             // to loop until LOGOUT
-            if(al.size()==2) {
+            /*if(al.size()==2) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 broadcast("Nous sommes au complet, nous pouvons commencer le jeu");
-            }
+            }*/
             boolean keepGoing = true;
             while(keepGoing) {
                 // read a String (which is an object)
@@ -330,6 +309,7 @@ public class Server {
                         }
                         break;
                     case ChatMessage.JOUER:
+                        broadcast(username+" veut jouer");
                         writeMsg("Voulez vous commencer a jouer ?");
                         try {
                             cm = (ChatMessage) sInput.readObject();
@@ -344,7 +324,7 @@ public class Server {
 
                         switch (cm.getType()){
                             case ChatMessage.YES:
-                                writeMsg("Ok, le jeu va commencer");
+
                                 mainGame.partie();
 
                                 /*try {
@@ -374,7 +354,7 @@ public class Server {
         }
 
         // close everything
-        private void close() {
+        public void close() {
             try {
                 if(sOutput != null) sOutput.close();
             }
@@ -390,7 +370,7 @@ public class Server {
         }
 
         // write a String to the Client output stream
-        private boolean writeMsg(String msg) {
+        public boolean writeMsg(String msg) {
             // if Client is still connected send the message to it
             if(!socket.isConnected()) {
                 close();
