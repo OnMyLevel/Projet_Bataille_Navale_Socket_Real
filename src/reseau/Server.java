@@ -1,10 +1,12 @@
 package reseau;
 
 
+import IHM.Launcher;
 import game.Game;
 import model.Carte;
 import model.Flotte;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
@@ -24,6 +26,7 @@ public class Server {
     // notification
     private String notif = " *** ";
     private Game mainGame;
+    private Launcher launcher;
 
     //constructor that receive the port to listen to for connection as parameter
 
@@ -35,6 +38,7 @@ public class Server {
         // an ArrayList to keep the list of the Client
         al = new ArrayList<ClientThread>();
         mainGame = new Game();
+
         //String bindAddress = "192.162.20.1";
     }
 
@@ -83,6 +87,8 @@ public class Server {
                         e.printStackTrace();
                     }
                     broadcast("--- START ---");
+                    Launcher launcher = new Launcher();
+
 
                     //mainGame.partie();
                     mainGame.infoGame();
