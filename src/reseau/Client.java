@@ -209,11 +209,11 @@ public class Client  {
             else if(msg.equalsIgnoreCase("OUI")){
                     client.sendMessage(new ChatMessage(ChatMessage.YES,""));
             }
-            else if(msg.equalsIgnoreCase("MANUELLEMENT")){
-                client.sendMessage(new ChatMessage(ChatMessage.MANUELLEMENT,""));
+            else if(msg.equalsIgnoreCase("MANUEL")){
+                client.sendMessage(new ChatMessage(ChatMessage.MANUEL,""));
             }
-            else if(msg.equalsIgnoreCase("AUTOMATIQUEMENT")){
-                client.sendMessage(new ChatMessage(ChatMessage.AUTOMATIQUEMENT,""));
+            else if(msg.equalsIgnoreCase("AUTOMATIQUE")){
+                client.sendMessage(new ChatMessage(ChatMessage.AUTOMATIQUE,""));
             }
             else if(msg.equalsIgnoreCase("INSTRUCTION")){
                 client.sendMessage(new ChatMessage(ChatMessage.INSTRUCTION,""));

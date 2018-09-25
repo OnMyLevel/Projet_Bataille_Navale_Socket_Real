@@ -321,7 +321,7 @@ public class Server {
                             }
                             break;
                         case ChatMessage.LOCATION:
-                            writeMsg("Voulez vous placer les bateaux MANUELLEMENT ou AUTOMATIQUEMENT ?");
+                            writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
                             try {
                                 cm = (ChatMessage) sInput.readObject();
                             } catch (IOException e) {
@@ -331,11 +331,11 @@ public class Server {
                                 break;
                             }
                             switch (cm.getType()) {
-                                case ChatMessage.MANUELLEMENT:
+                                case ChatMessage.MANUEL:
                                     writeMsg("D'accord ils vont être placés manuellement");
                                     broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                                     break;
-                                case ChatMessage.AUTOMATIQUEMENT:
+                                case ChatMessage.AUTOMATIQUE:
                                     writeMsg("D'accord ils vont être placés automatiquement");
                                     broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                                     break;
