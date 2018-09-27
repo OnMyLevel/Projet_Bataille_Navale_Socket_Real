@@ -14,7 +14,7 @@ public class serverSocket {
 
     public static void main(String args[]) throws IOException {
 
-        final int portNumber = 81;
+        final int portNumber = 80;
         System.out.println("Creating server socket on port " + portNumber);
         ServerSocket serverSocket = new ServerSocket(portNumber);
 

@@ -1,6 +1,7 @@
 package game;
 
 import model.Addresse;
+import model.Carte;
 
 import java.util.Scanner;
 
@@ -11,18 +12,39 @@ public class Joueur {
     private  int score;
     private int idGame;
 
+    private Carte mapsJoueur;
+
+    public Carte getMapsJoueur() {
+
+        return mapsJoueur;
+    }
+
+    public void setMapsJoueur(Carte mapsJoueur) {
+        this.mapsJoueur = mapsJoueur;
+    }
+
     public Joueur(String login, String password, int score, int idGame) {
         this.login = login;
         this.password = password;
         this.score = score;
         this.idGame = idGame;
+        this.mapsJoueur = new Carte();
+    }
+    public Joueur(String login, String password,int idGame) {
+        this.login = login;
+        this.password = password;
+        this.score = 0;
+        this.idGame = idGame;
+        this.mapsJoueur = new Carte();
     }
 
     public int getIdGame() {
+
         return idGame;
     }
 
-    public void setIdGame(int idGame) {
+    public void setIdGame(int idGame)
+    {
         this.idGame = idGame;
     }
 
@@ -40,12 +62,6 @@ public class Joueur {
     public Joueur(String login, String password) {
         this.login = login;
         this.password = password;
-    }
-
-    public Joueur(String login, String password, int score) {
-        this.login = login;
-        this.password = password;
-        this.score = score;
     }
 
     public String getLogin() {

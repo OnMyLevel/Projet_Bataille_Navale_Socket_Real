@@ -2,7 +2,10 @@ package reseau;
 
 
 import game.Game;
+import game.Joueur;
+import model.Addresse;
 import model.Carte;
+import model.Element;
 import model.Flotte;
 
 import java.io.*;
@@ -40,15 +43,13 @@ public class Server {
     public void start() {
         keepGoing = true;
         //create socket server and wait for connection requests
-        try
-        {
+        try {
             // the socket used by the server
             ServerSocket serverSocket = new ServerSocket(port);
 
             // infinite loop to wait for connections ( till server is active )
-            while(keepGoing)
-            {
-                if(al.size()<2) {
+            while (keepGoing) {
+                if (al.size() < 2) {
                     display("Server waiting for Clients on port " + port + ".");
                     // accept connection if requested from client
                     Socket socket = serverSocket.accept();
@@ -59,10 +60,11 @@ public class Server {
                     ClientThread t = new ClientThread(socket);
                     //add this client to arraylist
                     al.add(t);
+                    this.mainGame.getJoueurs().add(new Joueur(t.username, t.username, t.id));
                     System.out.println(al.size());
                     t.start();
                 }
-                if(al.size()==2){
+                if (al.size() == 2) {
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
                     broadcast("Le jeu commencera dans 3...");
                     try {
@@ -83,11 +85,12 @@ public class Server {
                         e.printStackTrace();
                     }
                     broadcast("--- START ---");
-
                     mainGame.partie();
+                    // }
                     mainGame.infoGame();
                     Socket socket = serverSocket.accept();
-                    if(!keepGoing)
+
+                    if (!keepGoing)
                         break;
                     // if client is connected, create its thread
                     ClientThread t = new ClientThread(socket);
@@ -98,26 +101,52 @@ public class Server {
             // try to stop the server
             try {
                 serverSocket.close();
-                for(int i = 0; i < al.size(); ++i) {
+                for (int i = 0; i < al.size(); ++i) {
                     ClientThread tc = al.get(i);
                     try {
                         // close all data streams and socket
                         tc.sInput.close();
                         tc.sOutput.close();
                         tc.socket.close();
-                    }
-                    catch(IOException ioE) {
+                    } catch (IOException ioE) {
                     }
                 }
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 display("Exception closing the server and clients: " + e);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             String msg = sdf.format(new Date()) + " Exception on new ServerSocket: " + e + "\n";
             display(msg);
         }
+    }
+
+
+    private boolean lanceAttaque(Addresse tmp) {
+        return true;
+    }
+
+    public int partie () {
+        //System.out.println(" Bienvenue sur la partie \n ");
+        // System.out.println(this.getJoueurs().toString());
+        //if(this.PlacementBateau()) {
+        System.out.println(" Lancement de la Partie \n ");
+        while (mainGame.getFlotte().finDeLaFlotte() == false) {
+            boolean point;
+            for (int i = 0; i < this.al.size(); i++) {
+                Addresse tmp = null;
+                // avoir les coordonée donnée par le al
+                System.out.println("Joueur "+1+" à toi de jouer ");
+                point = this.lanceAttaque(tmp);
+                if (point) {
+                    System.out.println("Vous avez toucher la case : ");
+                    //this.getJoueurs().get(i).setScore( this.getJoueurs().get(i).getScore()+1);
+                    //this.getJoueurs().get(i).getMapsJoueur().setElementT(new Element(tmp.getAdrLigne(),tmp.getAdrColone(),"abime"),tmp);
+                }
+            }
+        }
+        mainGame.infoGame();
+        System.out.print('\u000C');
+        return  0;
     }
 
     // to stop the server

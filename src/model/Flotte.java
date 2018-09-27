@@ -23,6 +23,10 @@ public class Flotte {
         this.maps = new Carte();
     }
 
+    public Carte getMaps() {
+        return maps;
+    }
+
     public boolean freePosition(int x, int y) {
         boolean verif = false;
         if (this.maps.caseValide(new Addresse(x, y)) && this.maps.caseVide(new Addresse(x, y))) {

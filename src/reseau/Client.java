@@ -1,6 +1,8 @@
 package reseau;
 
 
+import game.Joueur;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -16,14 +18,7 @@ public class Client  {
     private Socket socket;
     private String server, username;
     private int port;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    private Joueur joueur;
 
 
     Client(String server, int port, String username) {

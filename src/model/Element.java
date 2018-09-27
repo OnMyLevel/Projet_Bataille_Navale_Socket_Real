@@ -9,7 +9,13 @@ public class Element {
         etat="intact";
     }
 
+    public Element(int i, int j,String s) {
+        this.adr = new Addresse(i,j);
+        etat=s;
+    }
+
     public Element() {
+
         etat="intact";
     }
 
