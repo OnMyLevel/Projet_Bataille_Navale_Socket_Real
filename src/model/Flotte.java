@@ -214,10 +214,12 @@ public class Flotte {
             int y=(int) (Math.random() * 9 );
             int ale= (int) (Math.random() * 2);
             boolean vertical = false;
-            if(ale>0){
-                a = this.placeSousmarin(new Addresse(x,y),true);
-            }else{
-                a = this.placeSousmarin(new Addresse(x,y),false);
+            if(x>1 && y>1) {
+                if (ale > 0) {
+                    a = this.placeSousmarin(new Addresse(x, y), true);
+                } else {
+                    a = this.placeSousmarin(new Addresse(x, y), false);
+                }
             }
         }
         return a;
