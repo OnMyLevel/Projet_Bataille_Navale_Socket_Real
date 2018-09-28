@@ -53,7 +53,7 @@ public class Bateau {
         boolean res=true;
         int i=0;
         while((i<element.length)&&res){
-            res=(res)&&(element[i].getEtat() == "abime");
+            res=(res)&&(element[i].toString() == " * ");
             i++;
         }
         return res;

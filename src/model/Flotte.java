@@ -181,7 +181,7 @@ public class Flotte {
         return a;
     }
 
-    public boolean adrToucher(Addresse t) {
+    public int adrToucher(Addresse t) {
         int i = 0;
         while (i <this.compBateau.size()){
             for (int j = 0; j < this.compBateau.get(i).getElement().length;j++) {
@@ -189,13 +189,13 @@ public class Flotte {
                     System.out.println("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
                     this.maps.afficheCarte();
                     this.bateauDetruit();
-                    return true;
+                    return 1;
                 }
             }
             i++;
         }
         this.bateauDetruit();
-        return false;
+        return 0;
     }
 
     public void bateauDetruit() {

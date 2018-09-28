@@ -75,7 +75,7 @@ public class GameLocal {
         return  new Addresse(x,y);
     }
 
-    public boolean lanceAttaque() {
+    public int lanceAttaque() {
         return this.flotte.adrToucher(this.recupAdr());
     }
 
@@ -239,9 +239,9 @@ public class GameLocal {
         if(this.PlacementBateau()) {
             System.out.println(" Lancement de la Partie \n ");
             while (this.flotte.finDeLaFlotte() == false) {
-                boolean test = false;
+                int test = 0;
                 test = lanceAttaque();
-                if (test) {
+                if (test==1) {
                     aide=0;
                     this.getSimplJoueur().setScore(this.getSimplJoueur().getScore() + 1);
                     this.infoGame();

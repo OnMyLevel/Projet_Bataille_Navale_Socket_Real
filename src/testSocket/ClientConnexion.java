@@ -51,9 +51,7 @@ public class ClientConnexion implements Runnable{
                 writer.write(commande);
                 //TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS AU SERVEUR
                 writer.flush();
-
                 System.out.println("Commande " + commande + " envoyée au serveur");
-
                 //On attend la réponse
                 String response = read();
                 System.out.println("\t * " + name + " : Réponse reçue " + response);
@@ -74,7 +72,7 @@ public class ClientConnexion implements Runnable{
         writer.close();
     }
 
-    //Méthode qui permet d'envoyer des commandeS de façon aléatoire
+    //Méthode qui permet d'envoyer une attaque
     private String getCommand(){
         System.out.println(" Tapez un commande \n ");
         Scanner sc = new Scanner(System.in);

@@ -1,5 +1,9 @@
 package testSocket;
 
+import game.Game;
+import game.Joueur;
+import model.Addresse;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,8 +18,17 @@ public class ClientProcessor implements Runnable{
     private Socket sock;
     private PrintWriter writer = null;
     private BufferedInputStream reader = null;
+    private Game realGame;
+    private  Joueur joueur;
 
-    public ClientProcessor(Socket pSock){
+    public ClientProcessor(Socket pSock, Game agame , Joueur joueur){
+
+        sock = pSock;
+        realGame = agame;
+        this.joueur= joueur;
+    }
+
+    public ClientProcessor(Socket pSock) {
         sock = pSock;
     }
 
@@ -49,19 +62,18 @@ public class ClientProcessor implements Runnable{
                 //On traite la demande du client en fonction de la commande envoyée
                 String toSend = "";
 
-                switch(response.toUpperCase()){
-                    case "FULL":
-                        toSend = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM).format(new Date());
+
+                String[] a = response.split(",");
+                System.out.println(a[0].toString());
+                int x = Integer.valueOf(a[0]);
+                int y = Integer.valueOf(a[1]);
+                int test  = realGame.lanceAttaque( new Addresse(x,y));
+                switch(test){
+                    case 0:
+                        toSend = "A l'eau";
                         break;
-                    case "DATE":
-                        toSend = DateFormat.getDateInstance(DateFormat.FULL).format(new Date());
-                        break;
-                    case "HOUR":
-                        toSend = DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
-                        break;
-                    case "CLOSE":
-                        toSend = "Communication terminée";
-                        closeConnexion = true;
+                    case 1:
+                        toSend = "Toucher ";
                         break;
                     default :
                         toSend = "Commande inconnu !";

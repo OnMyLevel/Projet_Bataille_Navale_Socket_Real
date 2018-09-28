@@ -8,7 +8,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashMap;
+import java.util.ArrayList;
+
 
 public class TimeServer {
 
@@ -18,7 +19,7 @@ public class TimeServer {
     private ServerSocket server = null;
     private boolean isRunning = true;
     private Game realGame;
-    private HashMap<Thread, Joueur> joueurHashMap;
+    private ArrayList<Thread> listThread;
 
     public TimeServer(){
         try {
@@ -29,7 +30,7 @@ public class TimeServer {
             e.printStackTrace();
         }
 
-        joueurHashMap = new HashMap<>();
+        listThread = new ArrayList<>();
         realGame = new Game();
     }
 
@@ -73,14 +74,6 @@ public class TimeServer {
         this.realGame = realGame;
     }
 
-    public HashMap<Thread, Joueur> getJoueurHashMap() {
-        return joueurHashMap;
-    }
-
-    public void setJoueurHashMap(HashMap<Thread, Joueur> joueurHashMap) {
-        this.joueurHashMap = joueurHashMap;
-    }
-
     public TimeServer(String pHost, int pPort){
         host = pHost;
         port = pPort;
@@ -100,6 +93,7 @@ public class TimeServer {
         //Toujours dans un thread à part vu qu'il est dans une boucle infinie
         Thread t = new Thread(new Runnable(){
             public void run(){
+                int i =0;
                 while(isRunning == true){
 
                     try {
@@ -108,19 +102,14 @@ public class TimeServer {
 
                         //Une fois reçue, on la traite dans un thread séparé
                         System.out.println("Connexion cliente reçue.");
-                        Thread t = new Thread(new ClientProcessor(client));
-                        if(joueurHashMap.isEmpty()) {
+                        if(listThread.isEmpty()) {
                             System.out.println("Connexion cliente reçue.");
-                            Joueur tmp = new Joueur(t.getName(), "0000", 0,0);
-                            joueurHashMap.put(t, tmp);
+                            Joueur tmp = new Joueur("joueur-"+listThread.size(), "0000", 0,listThread.size());
                             realGame.ajouerJoueur(tmp);
                         }
-                        else{
-                            System.out.println("Connexion cliente reçue.");
-                            Joueur tmp = new Joueur(t.getName(), "0000", 0,joueurHashMap.size());
-                            joueurHashMap.put(t, tmp);
-                            realGame.ajouerJoueur(tmp);
-                        }
+                        Thread t = new Thread(new ClientProcessor(client,realGame,realGame.getJoueurs().get(listThread.size())));
+                        listThread.add(t);
+                        System.out.println();
                         t.start();
                     } catch (IOException e) {
                         e.printStackTrace();

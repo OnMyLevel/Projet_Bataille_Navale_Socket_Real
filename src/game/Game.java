@@ -84,7 +84,8 @@ public class Game {
         return  new Addresse(x,y);
     }
 
-    public boolean lanceAttaque(Addresse a) {
+    public int lanceAttaque(Addresse a) {
+
         return this.flotte.adrToucher(a);
     }
 
@@ -242,11 +243,11 @@ public class Game {
     public int  partie(){
             System.out.println(" Lancement de la Partie \n ");
             while (this.flotte.finDeLaFlotte() == false) {
-                boolean point;
+                int point;
                 for(int i=0;i< this.joueurs.size();i++){
                     Addresse tmp = this.joueurs.get(i).lanceAttaque();
                     point = this.lanceAttaque(this.joueurs.get(i).lanceAttaque());
-                    if(point){
+                    if(point==1){
                         this.getJoueurs().get(i).setScore( this.getJoueurs().get(i).getScore()+1);
                         this.getJoueurs().get(i).getMapsJoueur().setElementT(new Element(tmp.getAdrLigne(),tmp.getAdrColone(),"abime"),tmp);
                     }
