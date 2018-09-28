@@ -13,6 +13,15 @@ public class Game {
     private ArrayList<Joueur> joueurs;
     private Flotte flotte;
     private int score;
+    int ancienNombreJoueur;
+
+    public int getAncienNombreJoueur() {
+        return ancienNombreJoueur;
+    }
+
+    public void setAncienNombreJoueur(int ancienNombreJoueru) {
+        this.ancienNombreJoueur = ancienNombreJoueru;
+    }
 
     @Override
     public String toString() {
@@ -231,9 +240,6 @@ public class Game {
     }
 
     public int  partie(){
-        //System.out.println(" Bienvenue sur la partie \n ");
-       // System.out.println(this.getJoueurs().toString());
-        //if(this.PlacementBateau()) {
             System.out.println(" Lancement de la Partie \n ");
             while (this.flotte.finDeLaFlotte() == false) {
                 boolean point;
@@ -247,22 +253,27 @@ public class Game {
                 }
                 System.out.print('\u000C');
             }
-       // }
         return 0;
     }
 
     public String infoGame(){
 
-        System.out.println("Actuellement \n ");
         System.out.println(this.getJoueurs().toString());
         System.out.println("Il reste : " + this.getFlotte().getNombreBateau() + " Bateaux");
         System.out.println(this.getFlotte().afficheFlotte().toString());
         this.flotte.afficheCarte();
         String a = (" Actuellement\n "
                 + "Il reste : "+this.getFlotte().getNombreBateau() + " Bateaux \n");
-
+             a +=this.getFlotte().afficheFlotte().toString();
         return a;
     }
 
 
+
+   public void ajouerJoueur(Joueur a){
+        this.getJoueurs().add(a);
+        if(this.getJoueurs().size() >0) {
+            this.ancienNombreJoueur = this.getJoueurs().size() - 1;
+        }
+    }
 }

@@ -9,15 +9,20 @@ import java.awt.*;
 
 import game.Game;
 import model.Addresse;
+import testSocket.TimeServer;
 
 import  java.awt.event.*;
 
-public class Fenjeu extends JFrame implements  ActionListener{
+public class FenAdmin extends JFrame implements  ActionListener{
 
+    /**
+     * Gestion du jeux
+     */
+    private TimeServer server;
 
-    private Game moteurJeu;
-
-
+    /**
+     * Gestion de l'IHM
+     */
     private JTextArea ta  = new JTextArea();
     private JTextArea tb;
     private JLabel[][] tab; // tableau de JLabels
@@ -33,15 +38,16 @@ public class Fenjeu extends JFrame implements  ActionListener{
     private JRadioButton vertical;
     private  JTextArea getCoord;
     private JButton   valider;
+    private JOptionPane bateauInfo;
+    private JButton   lancerPartie;
+    private JTextArea infoGenerale;
 
 
-
-    public Fenjeu (String titre, int x, int y, int w, int h, Game moteurJeu) {
+    public FenAdmin(String titre, int x, int y, int w, int h, Game moteurJeu) {
 
         super(titre);
 
         this.setLayout(new BorderLayout());
-        this.moteurJeu = moteurJeu;
         this.initialise();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(x, y, w, h);
@@ -50,16 +56,20 @@ public class Fenjeu extends JFrame implements  ActionListener{
         //this.getPanelCenter().getAccessibleContext().getAccessibleChild(1).
     }
 
-    public Fenjeu () {
+    public void initGame(){
+        this.server = new TimeServer();
+        this.server.open();
+        this.server.setRealGame( new  Game());
+    }
+
+    public FenAdmin() {
 
         super("BATAILLE NAVALE");
-
-        this.moteurJeu = new Game();
-
+        this.initGame();
         this.setLayout(new BorderLayout());
         this.initialise();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(800, 700, 800, 700);
+        this.setBounds(800, 700, 1200, 800);
         this.setResizable(false);
         this.setVisible(true);
     }
@@ -75,25 +85,24 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
     public JPanel getPanelCenter() {
 
-       // JTabbedPane tabpane = new JTabbedPane();
         JPanel pan = new JPanel();
+
         pan.setBorder(BorderFactory.createTitledBorder("Grille"));
         pan.setLayout(new GridLayout(0, 1));
-        tab = new JLabel[10][10]; // cr�ation du tableau de JLabel
+        tab = new JLabel[10][10];
         panelGrille.setBounds(new Rectangle(5, 65, 550, 465));
         panelGrille.setBorder(BorderFactory
                 .createEtchedBorder(EtchedBorder.RAISED));
         panelGrille.setLayout(gridLayout1);
-        gridLayout1.setColumns(moteurJeu.getFlotte().getMaps().TAILLELIGNE);
-        gridLayout1.setRows(moteurJeu.getFlotte().getMaps().TAILLECOLONNE);
+        gridLayout1.setColumns(this.server.getRealGame().getFlotte().getMaps().TAILLELIGNE);
+        gridLayout1.setRows(this.server.getRealGame().getFlotte().getMaps().TAILLECOLONNE);
+
         this.getContentPane().add(panelblanc, null);
         this.getContentPane().add(panelGrille, null);
 
-
         //J'attribue la couleur aux JLabels
-       // int a = 1;
-        for (int i = 0; i < moteurJeu.getFlotte().getMaps().TAILLELIGNE; i++) {
-            for (int j = 0; j < moteurJeu.getFlotte().getMaps().TAILLECOLONNE; j++) {
+        for (int i = 0; i < this.server.getRealGame().getFlotte().getMaps().TAILLELIGNE; i++) {
+            for (int j = 0; j < this.server.getRealGame().getFlotte().getMaps().TAILLECOLONNE; j++) {
                 this.tab[i][j] = new JLabel(); // cr��ation du JLabel
                 this.tab[i][j].setOpaque(true);
                 this.panelGrille.add(tab[i][j]); // ajouter au Panel
@@ -112,31 +121,29 @@ public class Fenjeu extends JFrame implements  ActionListener{
                     this.tab[i][j].setBackground(Color.white);
                 }
                 else{
-                    if(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="#") {
-                        this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
+                    if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="#") {
+                        this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.red);
                         this.tab[i][j].setText(i+","+j);
                     }
-                    else if(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="*") {
-                        this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
+                    else if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="*") {
+                        this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.magenta);
                         this.tab[i][j].setText(i+","+j);
                     }
                     else {
-                        this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
+                        this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.blue);
                         this.tab[i][j].setText(i+","+j);
                     }
                }
-
                 // create a line border with the specified color and width
                 Border border = BorderFactory.createLineBorder(Color.black, 1);
                 this.tab[i][j].setBorder(border);
-                this.tab[i][j].addMouseListener(new LabelAdapter());
+              //  this.tab[i][j].addMouseListener(new LabelAdapter());
             }
 
         }
-
         pan.add(panelGrille);
         return pan;
     }
@@ -144,8 +151,14 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
     public JPanel getPanelWeast() {
         JPanel pan = new JPanel();
-        pan.setBorder(BorderFactory.createTitledBorder("Déplacements"));
-        pan.setLayout(new GridLayout(3,3));
+        pan.setBorder(BorderFactory.createTitledBorder("Infos Generale"));
+        pan.setLayout(new GridLayout(0,1));
+        infoGenerale = new JTextArea ( 16, 25 );
+        infoGenerale.setEditable ( false ); // set textArea non-editable
+        JScrollPane scroll = new JScrollPane ( infoGenerale );
+        scroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+        pan.add(scroll);
+
         return pan;
     }
 
@@ -158,16 +171,16 @@ public class Fenjeu extends JFrame implements  ActionListener{
         JPanel pan_score = new JPanel();
         JPanel pan_nbdepla = new JPanel();
 
-        pan_score.setBorder(BorderFactory.createTitledBorder("Nombre Bateaux"));
-        pan_nbdepla.setBorder(BorderFactory.createTitledBorder("Nombre Joueurs"));
+        pan_score.setBorder(BorderFactory.createTitledBorder("Nombre Bateaux: "));
+        pan_nbdepla.setBorder(BorderFactory.createTitledBorder("Nombre Joueurs: "));
         String s = new String("                 ");
-        s += moteurJeu.getScore();
+        s += this.server.getRealGame().getScore();
         NbBateaux = new JTextArea(s);
         NbBateaux.setEditable(false);
         pan_score.add( NbBateaux);
 
         s = "                      ";
-        s += moteurJeu.infoGame();
+        s += this.server.getRealGame().infoGame();
         this.NbJoeur= new JTextArea(s);
         this.NbJoeur.setEditable(false);
         pan_nbdepla.add(this.NbJoeur);
@@ -179,17 +192,25 @@ public class Fenjeu extends JFrame implements  ActionListener{
     }
 
     public JPanel getPanelSouth() {
+
         JPanel pan = new JPanel();
-        pan.setBorder(BorderFactory.createTitledBorder("Autre commande "));
         JPanel pan_autre = new JPanel();
+
+        pan.setBorder(BorderFactory.createTitledBorder("Autre commande "));
         pan_autre.setLayout(new FlowLayout());
+
         JButton bout1 = new JButton ( new ActionRestart("Restart"));
-       // bout1.addActionListener(new BoutRe());
         JButton bout2 = new JButton ( new ActionQuitter("Quitter"));
-       // bout2.addActionListener(new BoutRe());
+        JButton bout3 = new JButton ( new ActionRefresh("Refresh"));
+        lancerPartie = new JButton ( new ActionLancer("LancerPartie"));
+
+        lancerPartie.setEnabled(false);
         pan_autre.add(bout1);
         pan_autre.add(bout2);
+        pan_autre.add(bout3);
+        pan_autre.add(lancerPartie);
         pan.add(pan_autre);
+
         return pan;
     }
 
@@ -204,11 +225,11 @@ public class Fenjeu extends JFrame implements  ActionListener{
         this.placementAl = new JButton( new ActionPlaceAle("Placement Ale"));
         this.placementMan = new JButton( new ActionPlaceMan("Placement Man"));
 
-        this.placementAl.setPreferredSize(new Dimension(100,10));
-        this.placementMan.setPreferredSize(new Dimension(100,10));
+        this.placementAl.setSize(new Dimension(100,5));
+        this.placementMan.setSize(new Dimension(100,5));
         this.getCoord.setBorder(BorderFactory.createTitledBorder("cood (X,Y)"));
-        this.infoGame.setTabSize(5150);
-        this.infoGame.setBorder(BorderFactory.createTitledBorder("Info Game "));
+        this.infoGame.setTabSize(100);
+        this.infoGame.setBorder(BorderFactory.createTitledBorder("Au Tours du Joueur"));
         pan_Mscore.setLayout(new GridLayout(0,1));
         pan_Mscore.setBorder(BorderFactory.createTitledBorder("Commande Admin "));
 
@@ -227,7 +248,9 @@ public class Fenjeu extends JFrame implements  ActionListener{
         pan_Mscore.add(this.vertical);
         pan_Mscore.add(valider);
         pan_Mscore.add(this.infoGame);
+
         pan.add(pan_Mscore);
+
         return pan;
     }
 
@@ -239,9 +262,6 @@ public class Fenjeu extends JFrame implements  ActionListener{
         this.comboBox.addItem("Croiseur");
         this.comboBox.addItem("Cuirrasse");
         this.comboBox.addItem("PorteAvion");
-
-
-
 
         //Ajout du listener
         this.comboBox.addItemListener(new ItemState());
@@ -270,9 +290,20 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Placement Ale");
-            moteurJeu.placeAle();
+            server.getRealGame().placeAle();
             placementAl.setEnabled(false);
             placementMan.setEnabled(false);
+
+
+            if (server.getRealGame().getFlotte().getNombreBateau() > 4) {
+                //Boîte du message d'information
+                bateauInfo = new JOptionPane();
+                bateauInfo.showMessageDialog(null,
+                        "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+                lancerPartie.setEnabled(true);
+                refreshJframe();
+            }
+
             refreshJframe();
         }
     }
@@ -283,61 +314,70 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Valider Placement");
+            if (getCoord.toString() != null) {
 
-            if( getCoord.toString() !=null){
                 String[] a = getCoord.getText().split(",");
                 System.out.println(a[0].toString());
                 int x = Integer.valueOf(a[0]);
                 int y = Integer.valueOf(a[1]);
-                System.out.println(x+","+y);
-                if(vertical.isValid()){
-                    switch(comboBox.getSelectedIndex())
-                    {
+
+                System.out.println(x + "," + y);
+
+                if (vertical.isValid()) {
+                    switch (comboBox.getSelectedIndex()) {
                         case 0:
                             System.out.println("Case1: Value is: 1 ");
-                            moteurJeu.getFlotte().placeSousmarin(new Addresse(x,y),true);
+                            server.getRealGame().getFlotte().placeSousmarin(new Addresse(x, y), true);
                         case 1:
                             System.out.println("Case2: Value is: 2 ");
-                            moteurJeu.getFlotte().placeTorpilleur(new Addresse(x,y),true);
+                            server.getRealGame().getFlotte().placeTorpilleur(new Addresse(x, y), true);
                         case 2:
                             System.out.println("Case3: Value is: 3");
-                            moteurJeu.getFlotte().placeCroiseur(new Addresse(x,y),true);
+                            server.getRealGame().getFlotte().placeCroiseur(new Addresse(x, y), true);
                         case 3:
                             System.out.println("Case3: Value is: 4");
-                            moteurJeu.getFlotte().placeCuirasse(new Addresse(x,y),true);
+                            server.getRealGame().getFlotte().placeCuirasse(new Addresse(x, y), true);
                         case 4:
                             System.out.println("Case3: Value is: 5");
-                            moteurJeu.getFlotte().placePorteAvion(new Addresse(x,y),true);
+                            server.getRealGame().getFlotte().placePorteAvion(new Addresse(x, y), true);
                         default:
                             System.out.println("False ");
                     }
-                }
-                else{
-                    switch(comboBox.getSelectedIndex())
-                    {
+                } else {
+                    switch (comboBox.getSelectedIndex()) {
                         case 0:
                             System.out.println("Case1: Value is: 1 ");
-                            moteurJeu.getFlotte().placeSousmarin(new Addresse(x,y),false);
+                            server.getRealGame().getFlotte().placeSousmarin(new Addresse(x, y), false);
                         case 1:
                             System.out.println("Case2: Value is: 2 ");
-                            moteurJeu.getFlotte().placeTorpilleur(new Addresse(x,y),false);
+                            server.getRealGame().getFlotte().placeTorpilleur(new Addresse(x, y), false);
                         case 2:
                             System.out.println("Case3: Value is: 3");
-                            moteurJeu.getFlotte().placeCroiseur(new Addresse(x,y),false);
+                            server.getRealGame().getFlotte().placeCroiseur(new Addresse(x, y), false);
                         case 3:
                             System.out.println("Case3: Value is: 4");
-                            moteurJeu.getFlotte().placeCuirasse(new Addresse(x,y),false);
+                            server.getRealGame().getFlotte().placeCuirasse(new Addresse(x, y), false);
                         case 4:
                             System.out.println("Case3: Value is: 5");
-                            moteurJeu.getFlotte().placePorteAvion(new Addresse(x,y),false);
+                            server.getRealGame().getFlotte().placePorteAvion(new Addresse(x, y), false);
                         default:
                             System.out.println("False ");
                     }
 
                 }
+                nombreDejoueursChange();
             }
 
-            refreshJframe();
+            if (server.getRealGame().getFlotte().getNombreBateau() > 5) {
+                valider.setEnabled(false);
+                //Boîte du message d'information
+                bateauInfo = new JOptionPane();
+                bateauInfo.showMessageDialog(null,
+                        "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+                lancerPartie.setEnabled(true);
+                nombreDejoueursChange();
+                refreshJframe();
+            }
         }
     }
 
@@ -348,13 +388,14 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Placement Ale");
-           // moteurJeu.placeAle();
+
             placementMan.setEnabled(false);
             placementAl.setEnabled(false);
             getCoord.setVisible(true);
             vertical.setVisible(true);
             valider.setVisible(true);
             comboBox.setVisible(true);
+            nombreDejoueursChange();
             refreshJframe();
         }
     }
@@ -366,9 +407,27 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Quitter");
-            moteurJeu = null;
+            server.setRealGame(null);
             close();
         }
+    }
+
+    public class ActionLancer extends AbstractAction {
+        public ActionLancer(String texte){
+            super(texte);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Lancer");
+            lancerPartie();
+            infoGenerale.setText(infoGenerale.getText()+"\n ********Lancement de la partie********");
+            nombreDejoueursChange();
+        }
+    }
+
+    private void lancerPartie() {
+        System.out.println("Lancement de la partie");
+        nombreDejoueursChange();
     }
 
     private class LabelAdapter extends MouseAdapter {
@@ -376,13 +435,12 @@ public class Fenjeu extends JFrame implements  ActionListener{
         public void mouseClicked(MouseEvent e) {
             JLabel a = (JLabel ) e.getComponent();
             System.out.println(a.getText());
+            nombreDejoueursChange();
         }
-
         @Override
         public void mouseEntered(MouseEvent e) {
 
         }
-
         @Override
         public void mouseExited(MouseEvent e) {
 
@@ -396,11 +454,24 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Restart");
-            moteurJeu = new Game();
+            server.setRealGame(new Game());
             placementAl.setEnabled(true);
             placementMan.setEnabled(true);
             comboBox.setVisible(false);
             refreshJframe();
+            nombreDejoueursChange();
+        }
+    }
+
+    public class ActionRefresh extends AbstractAction {
+        public ActionRefresh(String texte){
+            super(texte);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Refresh");
+            refreshJframe();
+            nombreDejoueursChange();
         }
     }
 
@@ -411,18 +482,21 @@ public class Fenjeu extends JFrame implements  ActionListener{
 
 
     public  void refreshJframe(){
+
        this.refreshPanelCenter();
        this.refreshPanelNorth();
        this.refreshPanelSouth();
        this.refreshPanelWest();
        this.refreshPanelEst();
+       nombreDejoueursChange();
        this.repaint();
+
     }
 
     private void refreshPanelNorth() {
-        this.NbJoeur.setText("Nombre de joueurs:"+this.moteurJeu.getJoueurs().size());
-        this.NbBateaux.setText("Nombre de Bateaux"+this.moteurJeu.getFlotte().getNombreBateau());
-
+        this.NbJoeur.setText("Nombre de joueurs: "+this.server.getRealGame().getJoueurs().size());
+        this.NbBateaux.setText("Nombre de Bateaux: "+this.server.getRealGame().getFlotte().getNombreBateau());
+        this.infoGenerale.setText(this.server.getRealGame().infoGame());
     }
 
     private void refreshPanelSouth() {
@@ -433,20 +507,27 @@ public class Fenjeu extends JFrame implements  ActionListener{
     }
 
     private void refreshPanelEst() {
-        this.infoGame.setText(this.moteurJeu.infoGame());
+        this.infoGame.setText(this.server.getRealGame().infoGame());
+    }
+
+    public  void  nombreDejoueursChange(){
+        if(this.server.getRealGame().getJoueurs().size() > this.server.getRealGame().getAncienNombreJoueur()){
+            bateauInfo = new JOptionPane();
+            bateauInfo.showMessageDialog(null,
+                    this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()+1)+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     public void refreshPanelCenter() {
 
-        for (int i = 0; i < moteurJeu.getFlotte().getMaps().TAILLELIGNE; i++) {
-            for (int j = 0; j < moteurJeu.getFlotte().getMaps().TAILLECOLONNE; j++) {
+        for (int i = 0; i < this.server.getRealGame().getFlotte().getMaps().TAILLELIGNE; i++) {
+            for (int j = 0; j < this.server.getRealGame().getFlotte().getMaps().TAILLECOLONNE; j++) {
                 //this.tab[i][j] = new JLabel(); // cr��ation du JLabel
                 this.tab[i][j].setOpaque(true);
                 this.panelGrille.add(tab[i][j]); // ajouter au Panel
                 this.tab[i][j].setOpaque(true);
                 this.tab[i][j].setHorizontalAlignment(SwingConstants.CENTER); // pour
                 // tab[colonne][ligne].addMouseListener((MouseListener) ); // ajouter l'��couteur aux
-
                 if(j==0 && i==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
@@ -460,37 +541,33 @@ public class Fenjeu extends JFrame implements  ActionListener{
                     this.tab[i][j].setBackground(Color.white);
                 }
                 else{
-                    if(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
+                    if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
                         //this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.red);
                         this.tab[i][j].setText(i+","+j);
                     }
-                    else if(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" * ") {
+                    else if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" * ") {
                        // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.magenta);
                         this.tab[i][j].setText(i+","+j);
                     }
                     else {
-                        this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
+                        this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.blue);
                         this.tab[i][j].setText(i+","+j);
                     }
                }
-
                 // create a line border with the specified color and width
                 Border border = BorderFactory.createLineBorder(Color.black, 1);
                 this.tab[i][j].setBorder(border);
             }
-
         }
     }
-
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        Fenjeu a = new Fenjeu();
-
+        FenAdmin a = new FenAdmin();
     }
 }
 
