@@ -2,8 +2,7 @@ package game;
 
 import model.Addresse;
 import model.Flotte;
-import reseau.Server;
-
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -213,6 +212,11 @@ public class Game {
     public boolean PlacementBateau(){
         int x=0;
         boolean bientFait=false;
+        String pg = "Je suis dans placement bateau \n";
+        //Server.ClientThread ct = new Server.ClientThread;
+        //System.out.println(ct.getUsername());
+        //ct.writeMsg(pg);
+
         System.out.println(" Souhaiter vous placer les Bateaux aumomatique ou manuellement ? \n ");
         System.out.println(" - Tapez 1 pour automatique \n ");
         System.out.println(" - Tapez 2 pour manuellement \n ");
@@ -231,7 +235,7 @@ public class Game {
 
 
 
-    public int  partie(){
+    public int  partie() throws IOException, ClassNotFoundException {
         System.out.println(" Bienvenue sur la partie \n ");
         System.out.println(this.getJoueurs().toString());
         if(this.PlacementBateau()) {
