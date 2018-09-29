@@ -1,7 +1,6 @@
 package game;
 
 import model.Addresse;
-import model.Element;
 import model.Flotte;
 import reseau.Server;
 
@@ -13,32 +12,6 @@ public class Game {
     private ArrayList<Joueur> joueurs;
     private Flotte flotte;
     private int score;
-    private int prochainJoueur;
-    int ancienNombreJoueur;
-
-    public int getProchainJoueur() {
-        return prochainJoueur;
-    }
-
-    public void setProchainJoueur(int prochainJoueur) {
-        this.prochainJoueur = prochainJoueur;
-    }
-
-    private String messageAttaque;
-
-    public int getAncienNombreJoueur() {
-        return ancienNombreJoueur;
-    }
-    public String getMessageAttaque() {
-        return messageAttaque;
-    }
-    public void setMessageAttaque(String messageAttaque) {
-        this.messageAttaque = messageAttaque;
-    }
-
-    public void setAncienNombreJoueur(int ancienNombreJoueru) {
-        this.ancienNombreJoueur = ancienNombreJoueru;
-    }
 
     @Override
     public String toString() {
@@ -77,8 +50,6 @@ public class Game {
         this.flotte = new Flotte();
         this.joueurs = new ArrayList<Joueur>();
         this.score = 0;
-        this.prochainJoueur = 0;
-        this.messageAttaque = "";
     }
 
     public Game(ArrayList<Joueur> joueurs, Flotte flotte, int score) {
@@ -103,8 +74,7 @@ public class Game {
         return  new Addresse(x,y);
     }
 
-    public int lanceAttaque(Addresse a) {
-
+    public boolean lanceAttaque(Addresse a) {
         return this.flotte.adrToucher(a);
     }
 
@@ -193,7 +163,7 @@ public class Game {
             case 4:
                 test = false;
                 System.out.println(" Placement de Cuirasse ! \n ");
-                System.out.println(" Placement vertical: 1 , horisental: 2 ? \n ");
+                System.out.println(" Placement vertical - 1 ou horisental - 2 ? \n ");
                 x = sc.nextInt();
                 if(x==1){
                     test=this.getFlotte().placeCuirasse(recupAdr(),true);
@@ -202,7 +172,7 @@ public class Game {
                 }
                 while (!test){
                     System.out.println(" Réssayer le placement! \n ");
-                    System.out.println(" Placement vertical: 1 ou horisental: 2 ? \n ");
+                    System.out.println(" Placement vertical - 1 ou horisental - 2 ? \n ");
                     x = sc.nextInt();
                     if(x==1){
                         test=this.getFlotte().placeCuirasse(recupAdr(),true);
@@ -215,7 +185,7 @@ public class Game {
             case 5:
                 test = false;
                 System.out.println(" Placement de PorteAvion ? \n ");
-                System.out.println(" Placement vertical: 1 , horisental 2 ? \n ");
+                System.out.println(" Placement vertical - 1 ou horisental - 2 ? \n ");
                 x = sc.nextInt();
                 if(x==1){
                     test=this.getFlotte().placePorteAvion(recupAdr(),true);
@@ -224,7 +194,7 @@ public class Game {
                 }
                 while (!test){
                     System.out.println(" Réssayer le placement! \n ");
-                    System.out.println(" Placement vertical: 1 , horisental: 2 ? \n ");
+                    System.out.println(" Placement vertical - 1 ou horisental - 2 ? \n ");
                     x = sc.nextInt();
                     if(x==1){
                         test=this.getFlotte().placePorteAvion(recupAdr(),true);
@@ -259,41 +229,39 @@ public class Game {
         return  bientFait;
     }
 
+
+
     public int  partie(){
+        System.out.println(" Bienvenue sur la partie \n ");
+        System.out.println(this.getJoueurs().toString());
+        if(this.PlacementBateau()) {
             System.out.println(" Lancement de la Partie \n ");
             while (this.flotte.finDeLaFlotte() == false) {
-                int point;
+                boolean point;
                 for(int i=0;i< this.joueurs.size();i++){
-                    Addresse tmp = this.joueurs.get(i).lanceAttaque();
                     point = this.lanceAttaque(this.joueurs.get(i).lanceAttaque());
-                    if(point==1){
+                    if(point){
                         this.getJoueurs().get(i).setScore( this.getJoueurs().get(i).getScore()+1);
-                        this.getJoueurs().get(i).getMapsJoueur().setElementT(new Element(tmp.getAdrLigne(),tmp.getAdrColone(),"abime"),tmp);
                     }
                 }
                 System.out.print('\u000C');
             }
+        }
         return 0;
     }
 
-    public String infoGame(){
+    public void infoGame(){
 
+        System.out.println("Actuellement \n ");
         System.out.println(this.getJoueurs().toString());
         System.out.println("Il reste : " + this.getFlotte().getNombreBateau() + " Bateaux");
         System.out.println(this.getFlotte().afficheFlotte().toString());
         this.flotte.afficheCarte();
-        String a = (" Actuellement\n "
+        /*String a = (" Actuellement\n "
                 + "Il reste : "+this.getFlotte().getNombreBateau() + " Bateaux \n");
-             a +=this.getFlotte().afficheFlotte().toString();
-        return a;
+
+        return a;*/
     }
 
 
-
-   public void ajouerJoueur(Joueur a){
-        this.getJoueurs().add(a);
-        if(this.getJoueurs().size() >0) {
-            this.ancienNombreJoueur = this.getJoueurs().size() - 1;
-        }
-    }
 }

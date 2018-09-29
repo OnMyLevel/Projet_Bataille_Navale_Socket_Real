@@ -1,8 +1,6 @@
 package reseau;
 
 
-import game.Joueur;
-
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -11,17 +9,24 @@ import java.util.*;
 
 public class Client  {
 
-    private String notif = " *** ";
+    public String notif = " *** ";
 
-    private ObjectInputStream sInput;
-    private ObjectOutputStream sOutput;
-    private Socket socket;
-    private String server, username;
-    private int port;
-    private Joueur joueur;
+    public ObjectInputStream sInput;
+    public ObjectOutputStream sOutput;
+    public Socket socket;
+    public String server, username;
+    public int port;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 
-    Client(String server, int port, String username) {
+    public Client(String server, int port, String username) {
         this.server = server;
         this.port = port;
         this.username = username;
@@ -81,7 +86,7 @@ public class Client  {
     /*
      * To send a message to the server
      */
-    void sendMessage(ChatMessage msg) {
+    public void sendMessage(ChatMessage msg) {
         try {
             sOutput.writeObject(msg);
         }

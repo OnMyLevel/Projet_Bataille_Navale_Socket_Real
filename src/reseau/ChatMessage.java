@@ -16,12 +16,12 @@ public class ChatMessage implements Serializable {
     private String message;
 
     // constructor
-    ChatMessage(int type, String message) {
+    public ChatMessage(int type, String message) {
         this.type = type;
         this.message = message;
     }
 
-    int getType() {
+    public int getType() {
         return type;
     }
 

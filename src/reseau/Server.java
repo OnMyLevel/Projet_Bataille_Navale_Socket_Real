@@ -1,6 +1,7 @@
 package reseau;
 
 
+import IHM.Launcher;
 import game.Game;
 import model.Carte;
 import model.Flotte;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class Server {
     // a unique ID for each connection
-    private static int uniqueId;
+    private int uniqueId;
     // an ArrayList to keep the list of the Client
     private ArrayList<ClientThread> al;
     // to display time
@@ -24,6 +25,9 @@ public class Server {
     // notification
     private String notif = " *** ";
     private Game mainGame;
+    private Flotte flotte;
+    private Carte carte;
+    private Launcher launcher;
 
     //constructor that receive the port to listen to for connection as parameter
 
@@ -35,9 +39,13 @@ public class Server {
         // an ArrayList to keep the list of the Client
         al = new ArrayList<ClientThread>();
         mainGame = new Game();
+        flotte = new Flotte();
+        carte = new Carte();
+
+        //String bindAddress = "192.162.20.1";
     }
 
-    public void start() {
+    private void start() {
         keepGoing = true;
         //create socket server and wait for connection requests
         try
@@ -48,7 +56,7 @@ public class Server {
             // infinite loop to wait for connections ( till server is active )
             while(keepGoing)
             {
-                if(al.size()<2) {
+                if(al.size()<3) {
                     display("Server waiting for Clients on port " + port + ".");
                     // accept connection if requested from client
                     Socket socket = serverSocket.accept();
@@ -59,32 +67,21 @@ public class Server {
                     ClientThread t = new ClientThread(socket);
                     //add this client to arraylist
                     al.add(t);
-                    System.out.println(al.size());
                     t.start();
                 }
-                if(al.size()==2){
+                if(al.size()==3){
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
                     broadcast("Le jeu commencera dans 3...");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    Attente();
                     broadcast("2...");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    Attente();
                     broadcast("1...");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    Attente();
                     broadcast("--- START ---");
+                    //Launcher launcher = new Launcher();
 
-                    mainGame.partie();
+
+                    //mainGame.partie();
                     mainGame.infoGame();
                     Socket socket = serverSocket.accept();
                     if(!keepGoing)
@@ -106,7 +103,7 @@ public class Server {
                         tc.sOutput.close();
                         tc.socket.close();
                     }
-                    catch(IOException ioE) {
+                    catch(IOException ignored) {
                     }
                 }
             }
@@ -120,29 +117,37 @@ public class Server {
         }
     }
 
+    private void Attente(){
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     // to stop the server
-    public  void stop() {
+    private void stop() {
         keepGoing = false;
         try {
             new Socket("127.0.0.1", port);
         }
-        catch(Exception e) {
+        catch(Exception ignored) {
         }
     }
 
     // Display an event to the console
-    public void display(String msg) {
+    private void display(String msg) {
         String time = sdf.format(new Date()) + " " + msg;
         System.out.println(time);
     }
 
     // to broadcast a message to all Clients
-    public synchronized boolean broadcast(String message) {
+    private synchronized boolean broadcast(String message) {
         // add timestamp to the message
         String time = sdf.format(new Date());
 
         // to check if message is private i.e. client to client message
-        String[] w = message.split(" ",3);
+        //String[] w = message.split(" ",3);
 
         String messageLf = time + " " + message + "\n";
         // display message
@@ -164,7 +169,7 @@ public class Server {
     }
 
     // if client sent LOGOUT message to exit
-    public synchronized void remove(int id) {
+    private synchronized void remove(int id) {
 
         String disconnectedClient = "";
         // scan the array list until we found the Id
@@ -214,16 +219,16 @@ public class Server {
     // One instance of this thread will run for each client
     public class ClientThread extends Thread {
         // the socket to get messages from client
-        Socket socket;
-        ObjectInputStream sInput;
-        ObjectOutputStream sOutput;
+        private Socket socket;
+        private ObjectInputStream sInput;
+        private ObjectOutputStream sOutput;
         //PrintWriter pw = new PrintWriter(sOutput,true);
         // my unique id (easier for deconnection)
         int id;
         // the Username of the Client
-        String username;
+        private String username;
         // message object to recieve message and its type
-        ChatMessage cm;
+        private ChatMessage cm;
         // timestamp
         String date;
 
@@ -246,12 +251,12 @@ public class Server {
                 display("Exception creating new Input/output Streams: " + e);
                 return;
             }
-            catch (ClassNotFoundException e) {
+            catch (ClassNotFoundException ignored) {
             }
             date = new Date().toString() + "\n";
         }
 
-        public String getUsername() {
+        private String getUsername() {
             return username;
         }
 
@@ -259,118 +264,70 @@ public class Server {
             this.username = username;
         }
 
+        private void getMessageClient(){
+            try {
+                cm = (ChatMessage) sInput.readObject();
+            } catch (IOException e) {
+                display(username + " Exception reading Streams: " + e);
+            } catch (ClassNotFoundException ignored) {
+
+            }
+        }
+
         // infinite loop to read and forward message
         public void run() {
             // to loop until LOGOUT
-            /*if(al.size()==2) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                broadcast("Nous sommes au complet, nous pouvons commencer le jeu");
-            }*/
+
             boolean keepGoing = true;
             while(keepGoing) {
                 // read a String (which is an object)
-                try {
-                    cm = (ChatMessage) sInput.readObject();
-                }
-                catch (IOException e) {
-                    display(username + " Exception reading Streams: " + e);
-                    break;
-                }
-                catch(ClassNotFoundException e2) {
-                    break;
-                }
+                getMessageClient();
                 // get the message from the ChatMessage object received
                 String message = cm.getMessage();
-
                 // different actions based on type message
-                switch(cm.getType()) {
 
-                    case ChatMessage.MESSAGE:
-                    boolean confirmation =  broadcast(username + ": " + message);
-                    if(confirmation==false){
-                    String msg = notif + "Sorry. No such user exists." + notif;
-                    writeMsg(msg);
-                    }
-                    break;
-                    case ChatMessage.LOGOUT:
-                        display(username + " disconnected with a LOGOUT message.");
-                        keepGoing = false;
-                        break;
-                    case ChatMessage.WHOISIN:
-                        writeMsg("List of the users connected at " + sdf.format(new Date()) + "\n");
-                        // send list of active clients
-                        for(int i = 0; i < al.size(); ++i) {
-                            ClientThread ct = al.get(i);
-                            writeMsg((i+1) + ") " + ct.username + " since " + ct.date);
-                        }
-                        break;
-                    case ChatMessage.JOUER:
-                        broadcast(username+" veut jouer");
-                        writeMsg("Voulez vous commencer a jouer ?");
-                        try {
-                            cm = (ChatMessage) sInput.readObject();
-                        }
-                        catch (IOException e) {
-                            display(username + " Exception reading Streams: " + e);
-                            break;
-                        }
-                        catch(ClassNotFoundException e2) {
-                            break;
-                        }
+                String admin = al.get(0).username;
+                String client1 = al.get(1).username;
+                String client2 = al.get(2).username;
 
-                        switch (cm.getType()){
-                            case ChatMessage.YES:
-
-                                mainGame.partie();
-
-                                /*try {
-                                    cm = (ChatMessage) sInput.readObject();
-                                }
-                                catch (IOException e) {
-                                    display(username + " Exception reading Streams: " + e);
-                                    break;
-                                }
-                                catch(ClassNotFoundException e2) {
-                                    break;
-                                }
-
-                                switch (cm.getType()){
-                                    case ChatMessage.CARTE:
-                                }*/
-
-                                break;
-                        }
-                        break;
+                //admin
+                if(username.equals(admin)) {
+                    Admin(message);
                 }
 
+                //client1
+                if(username.equals(client1)) {
+                    Client1(message);
+                }
+
+                if(username.equals(client2)) {
+                    Client2(message);
+                }
             }
             // if out of the loop then disconnected and remove from client list
             remove(id);
             close();
         }
 
+
         // close everything
-        public void close() {
+        private void close() {
             try {
                 if(sOutput != null) sOutput.close();
             }
-            catch(Exception e) {}
+            catch(Exception ignored) {}
             try {
                 if(sInput != null) sInput.close();
             }
-            catch(Exception e) {};
+            catch(Exception ignored) {}
             try {
                 if(socket != null) socket.close();
             }
-            catch (Exception e) {}
+            catch (Exception ignored) {}
         }
 
         // write a String to the Client output stream
-        public boolean writeMsg(String msg) {
+        private boolean writeMsg(String msg) {
             // if Client is still connected send the message to it
             if(!socket.isConnected()) {
                 close();
@@ -387,6 +344,147 @@ public class Server {
             }
             return true;
         }
+
+        private void Admin(String message){
+            writeMsg("Vous etes l'admin, tapez 'Instruction' pour voir les instructions");
+                    switch (cm.getType()) {
+
+                        case ChatMessage.INSTRUCTION:
+                            writeMsg("-- Un simple message pour l'admin --\n" +
+                                    "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
+                                    "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n" +
+                                    "3. Tapez 'LOCATION' pour placer les bateaux");
+                            break;
+                        case ChatMessage.MESSAGE:
+                            boolean confirmation = broadcast(username + ": " + message);
+                            if (confirmation == false) {
+                                String msg = notif + "Désolé. Cette utilisateur n'existe pas." + notif;
+                                writeMsg(msg);
+                            }
+                            break;
+                        case ChatMessage.LOGOUT:
+                            display(username + " s'est déconnecté avec le message LOGOUT.");
+                            keepGoing = false;
+                            break;
+                        case ChatMessage.WHOISIN:
+                            writeMsg("La liste des utilisateur à " + sdf.format(new Date()) + "\n");
+                            // send list of active clients
+                            for (int i = 0; i < al.size(); ++i) {
+                                ClientThread ct = al.get(i);
+                                writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                            }
+                            break;
+                        case ChatMessage.LOCATION:
+                            writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
+                            getMessageClient();
+                            switch (cm.getType()) {
+                                case ChatMessage.MANUEL:
+                                    writeMsg("D'accord ils vont être placés manuellement");
+                                    broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
+                                    break;
+                                case ChatMessage.AUTOMATIQUE:
+                                    //mainGame.PlacementBateau();
+                                    flotte.placeBateauAle();
+                                    flotte.afficheFlotte();
+                                    writeMsg(flotte.afficheFlotte());
+                                    flotte.afficheFlotte();
+                                    flotte.afficheCarte();
+                                    writeMsg(" Placement automatique lancer ");
+                                    broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
+                                    break;
+                            }
+                            break;
+                    }
+        }
+
+        private void Client1(String message){
+            writeMsg("Vous etes le joueur 1, tapez 'Instruction' pour avoir voir les instructions");
+            switch (cm.getType()) {
+                case ChatMessage.INSTRUCTION:
+                    writeMsg("-- Un simple message pour le joueur 1 --\n" +
+                            "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
+                            "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n");
+                    break;
+                case ChatMessage.MESSAGE:
+                    boolean confirmation = broadcast(username + ": " + message);
+                    if (confirmation == false) {
+                        String msg = notif + "Desolé. l'utilisateur n'existe pas." + notif;
+                        writeMsg(msg);
+                    }
+                    break;
+                case ChatMessage.LOGOUT:
+                    display(username + " s'est déconnecté avec le message LOGOUT.");
+                    keepGoing = false;
+                    break;
+                case ChatMessage.WHOISIN:
+                    writeMsg("La liste des utilisateurs à " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for (int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                    }
+                    break;
+                        /*case ChatMessage.JOUER:
+                            broadcast(username + " veut jouer");
+                            writeMsg("Voulez vous commencer a jouer ?");
+                            getMessageClient();
+                            switch (cm.getType()) {
+                                case ChatMessage.YES:
+                                    writeMsg("Ok d'accord");
+                                    break;
+                            }
+                            break;*/
+            }
+        }
+
+        private void Client2(String message){
+            writeMsg("Vous etes le joueur 2, tapez 'Instruction' pour avoir voir les instructions");
+            switch (cm.getType()) {
+                case ChatMessage.INSTRUCTION:
+                    writeMsg("-- Un simple message pour le joueur 2 --\n" +
+                            "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
+                            "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n");
+                    break;
+                case ChatMessage.MESSAGE:
+                    boolean confirmation = broadcast(username + ": " + message);
+                    if (confirmation == false) {
+                        String msg = notif + "Desolé. l'utilisateur n'existe pas." + notif;
+                        writeMsg(msg);
+                    }
+                    break;
+                case ChatMessage.LOGOUT:
+                    display(username + " s'est déconnecté avec le message LOGOUT.");
+                    keepGoing = false;
+                    break;
+                case ChatMessage.WHOISIN:
+                    writeMsg("La liste des utilisateurs à " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for (int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                    }
+                    break;
+                        /*case ChatMessage.JOUER:
+                            broadcast(username + " veut jouer");
+                            writeMsg("Voulez vous commencer a jouer ?");
+                            try {
+                                cm = (ChatMessage) sInput.readObject();
+                            } catch (IOException e) {
+                                display(username + " Exception reading Streams: " + e);
+                                break;
+                            } catch (ClassNotFoundException e2) {
+                                break;
+                            }
+                            switch (cm.getType()) {
+                                case ChatMessage.YES:
+                                    writeMsg("Ok d'accord");
+                                    break;
+                            }
+                            break;*/
+            }
+        }
+
+
     }
 }
 
