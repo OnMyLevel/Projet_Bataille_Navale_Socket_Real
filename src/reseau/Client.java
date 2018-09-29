@@ -134,7 +134,7 @@ public class Client  {
     public static void main(String[] args) {
         // default values if not entered
         int portNumber = 1500;
-        String serverAddress = "127.0.0.1";
+        String serverAddress = "localhost"; //192.168.20.31
         String userName = "Anonymous";
         Scanner scan = new Scanner(System.in);
 
@@ -182,14 +182,15 @@ public class Client  {
             // read message from user
             String msg = scan.nextLine();
             // logout if message is LOGOUT
-            if(msg.equalsIgnoreCase("instruction")){
+            /*if(msg.equalsIgnoreCase("instruction")){
                 System.out.println("Instructions:");
                 System.out.println("1. Simply type the message to send broadcast to all active clients");
                 System.out.println("2. Type 'WHOISIN' without quotes to see list of active clients");
                 System.out.println("3. Type 'LOGOUT' without quotes to logoff from server");
-                System.out.println("4. Type 'JOUER' without quotes to Start games");
+                System.out.println("4. Type 'LOCATION' without quotes to Start games");
             }
-            else if(msg.equalsIgnoreCase("LOGOUT")) {
+            else */
+            if(msg.equalsIgnoreCase("LOGOUT")) {
                 client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
                 break;
             }
@@ -203,8 +204,17 @@ public class Client  {
             else if(msg.equalsIgnoreCase("OUI")){
                     client.sendMessage(new ChatMessage(ChatMessage.YES,""));
             }
-            else if(msg.equalsIgnoreCase("CARTE")){
-                client.sendMessage(new ChatMessage(ChatMessage.CARTE,""));
+            else if(msg.equalsIgnoreCase("MANUEL")){
+                client.sendMessage(new ChatMessage(ChatMessage.MANUEL,""));
+            }
+            else if(msg.equalsIgnoreCase("AUTOMATIQUE")){
+                client.sendMessage(new ChatMessage(ChatMessage.AUTOMATIQUE,""));
+            }
+            else if(msg.equalsIgnoreCase("INSTRUCTION")){
+                client.sendMessage(new ChatMessage(ChatMessage.INSTRUCTION,""));
+            }
+            else if(msg.equalsIgnoreCase("LOCATION")){
+                client.sendMessage(new ChatMessage(ChatMessage.LOCATION,""));
             }
             // regular text message
             else {
