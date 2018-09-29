@@ -3,6 +3,7 @@ package reseau;
 
 import IHM.Launcher;
 import game.Game;
+import model.Addresse;
 import model.Carte;
 import model.Flotte;
 
@@ -24,9 +25,9 @@ public class Server {
     private boolean keepGoing;
     // notification
     private String notif = " *** ";
-    private Game mainGame;
-    private Flotte flotte;
-    private Carte carte;
+    public Game mainGame;
+    public Flotte flotte;
+    public Carte carte;
     private Launcher launcher;
 
     //constructor that receive the port to listen to for connection as parameter
@@ -48,15 +49,13 @@ public class Server {
     private void start() {
         keepGoing = true;
         //create socket server and wait for connection requests
-        try
-        {
+        try {
             // the socket used by the server
             ServerSocket serverSocket = new ServerSocket(port);
 
             // infinite loop to wait for connections ( till server is active )
-            while(keepGoing)
-            {
-                if(al.size()<3) {
+            while (keepGoing) {
+                if (al.size() < 3) {
                     display("Server waiting for Clients on port " + port + ".");
                     // accept connection if requested from client
                     Socket socket = serverSocket.accept();
@@ -69,7 +68,7 @@ public class Server {
                     al.add(t);
                     t.start();
                 }
-                if(al.size()==3){
+                if (al.size() == 3) {
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
                     broadcast("Le jeu commencera dans 3...");
                     Attente();
@@ -80,11 +79,8 @@ public class Server {
                     broadcast("--- START ---");
                     //Launcher launcher = new Launcher();
 
-
-                    //mainGame.partie();
-                    mainGame.infoGame();
                     Socket socket = serverSocket.accept();
-                    if(!keepGoing)
+                    if (!keepGoing)
                         break;
                     // if client is connected, create its thread
                     ClientThread t = new ClientThread(socket);
@@ -95,29 +91,26 @@ public class Server {
             // try to stop the server
             try {
                 serverSocket.close();
-                for(int i = 0; i < al.size(); ++i) {
+                for (int i = 0; i < al.size(); ++i) {
                     ClientThread tc = al.get(i);
                     try {
                         // close all data streams and socket
                         tc.sInput.close();
                         tc.sOutput.close();
                         tc.socket.close();
-                    }
-                    catch(IOException ignored) {
+                    } catch (IOException ignored) {
                     }
                 }
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 display("Exception closing the server and clients: " + e);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             String msg = sdf.format(new Date()) + " Exception on new ServerSocket: " + e + "\n";
             display(msg);
         }
     }
 
-    private void Attente(){
+    private void Attente() {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -130,8 +123,7 @@ public class Server {
         keepGoing = false;
         try {
             new Socket("127.0.0.1", port);
-        }
-        catch(Exception ignored) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -155,10 +147,10 @@ public class Server {
 
         // we loop in reverse order in case we would have to remove a Client
         // because it has disconnected
-        for(int i = al.size(); --i >= 0;) {
+        for (int i = al.size(); --i >= 0; ) {
             ClientThread ct = al.get(i);
             // try to write to the Client if it fails remove it from the list
-            if(!ct.writeMsg(messageLf)) {
+            if (!ct.writeMsg(messageLf)) {
                 al.remove(i);
                 display("Disconnected Client " + ct.username + " removed from list.");
             }
@@ -173,10 +165,10 @@ public class Server {
 
         String disconnectedClient = "";
         // scan the array list until we found the Id
-        for(int i = 0; i < al.size(); ++i) {
+        for (int i = 0; i < al.size(); ++i) {
             ClientThread ct = al.get(i);
             // if found remove it
-            if(ct.id == id) {
+            if (ct.id == id) {
                 disconnectedClient = ct.getUsername();
                 al.remove(i);
                 break;
@@ -194,12 +186,11 @@ public class Server {
     public static void main(String[] args) {
         // start server on port 1500 unless a PortNumber is specified
         int portNumber = 1500;
-        switch(args.length) {
+        switch (args.length) {
             case 1:
                 try {
                     portNumber = Integer.parseInt(args[0]);
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     System.out.println("Invalid port number.");
                     System.out.println("Usage is: > java Server [portNumber]");
                     return;
@@ -228,9 +219,12 @@ public class Server {
         // the Username of the Client
         private String username;
         // message object to recieve message and its type
-        private ChatMessage cm;
+        ChatMessage cm;
         // timestamp
         String date;
+        public Game mainGame =  new Game();
+        public Flotte flotte = new Flotte();
+        public Carte carte = new Carte();
 
         // Constructor
         ClientThread(Socket socket) {
@@ -239,19 +233,16 @@ public class Server {
             this.socket = socket;
             //Creating both Data Stream
             System.out.println("Thread trying to create Object Input/Output Streams");
-            try
-            {
+            try {
                 sOutput = new ObjectOutputStream(socket.getOutputStream());
-                sInput  = new ObjectInputStream(socket.getInputStream());
+                sInput = new ObjectInputStream(socket.getInputStream());
                 // read the username
                 username = (String) sInput.readObject();
                 broadcast(notif + username + " has joined the chat room." + notif);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 display("Exception creating new Input/output Streams: " + e);
                 return;
-            }
-            catch (ClassNotFoundException ignored) {
+            } catch (ClassNotFoundException ignored) {
             }
             date = new Date().toString() + "\n";
         }
@@ -264,12 +255,14 @@ public class Server {
             this.username = username;
         }
 
-        private void getMessageClient(){
+        public void getMessageClient(){
             try {
                 cm = (ChatMessage) sInput.readObject();
-            } catch (IOException e) {
-                display(username + " Exception reading Streams: " + e);
-            } catch (ClassNotFoundException ignored) {
+            }
+            catch (IOException e){
+                display(username+" Exception reading Streams: "+e);
+            }
+            catch (ClassNotFoundException ignored){
 
             }
         }
@@ -279,7 +272,7 @@ public class Server {
             // to loop until LOGOUT
 
             boolean keepGoing = true;
-            while(keepGoing) {
+            while (keepGoing) {
                 // read a String (which is an object)
                 getMessageClient();
                 // get the message from the ChatMessage object received
@@ -291,16 +284,17 @@ public class Server {
                 String client2 = al.get(2).username;
 
                 //admin
-                if(username.equals(admin)) {
+                if (username.equals(admin)) {
+                    writeMsg("Vous etes l'admin, tapez 'Instruction' pour voir les instructions");
                     Admin(message);
                 }
 
                 //client1
-                if(username.equals(client1)) {
+                if (username.equals(client1)) {
                     Client1(message);
                 }
 
-                if(username.equals(client2)) {
+                if (username.equals(client2)) {
                     Client2(message);
                 }
             }
@@ -309,27 +303,26 @@ public class Server {
             close();
         }
 
-
         // close everything
         private void close() {
             try {
-                if(sOutput != null) sOutput.close();
+                if (sOutput != null) sOutput.close();
+            } catch (Exception ignored) {
             }
-            catch(Exception ignored) {}
             try {
-                if(sInput != null) sInput.close();
+                if (sInput != null) sInput.close();
+            } catch (Exception ignored) {
             }
-            catch(Exception ignored) {}
             try {
-                if(socket != null) socket.close();
+                if (socket != null) socket.close();
+            } catch (Exception ignored) {
             }
-            catch (Exception ignored) {}
         }
 
         // write a String to the Client output stream
         private boolean writeMsg(String msg) {
             // if Client is still connected send the message to it
-            if(!socket.isConnected()) {
+            if (!socket.isConnected()) {
                 close();
                 return false;
             }
@@ -338,66 +331,67 @@ public class Server {
                 sOutput.writeObject(msg);
             }
             // if an error occurs, do not abort just inform the user
-            catch(IOException e) {
+            catch (IOException e) {
                 display(notif + "Error sending message to " + username + notif);
                 display(e.toString());
             }
             return true;
         }
 
-        private void Admin(String message){
-            writeMsg("Vous etes l'admin, tapez 'Instruction' pour voir les instructions");
+        private void Admin(String message) {
+            switch (cm.getType()) {
+                case ChatMessage.INSTRUCTION:
+                    writeMsg("-- Un simple message pour l'admin --\n" +
+                            "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
+                            "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n" +
+                            "3. Tapez 'LOCATION' pour placer les bateaux");
+                    break;
+                case ChatMessage.MESSAGE:
+                    boolean confirmation = broadcast(username + ": " + message);
+                    if (confirmation == false) {
+                        String msg = notif + "Désolé. Cette utilisateur n'existe pas." + notif;
+                        writeMsg(msg);
+                    }
+                    break;
+                case ChatMessage.LOGOUT:
+                    display(username + " s'est déconnecté avec le message LOGOUT.");
+                    keepGoing = false;
+                    break;
+                case ChatMessage.WHOISIN:
+                    writeMsg("La liste des utilisateur à " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for (int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                    }
+                    break;
+                case ChatMessage.AFFICHECARTE:
+                    writeMsg("affichercarte");
+                    writeMsg("\n" + flotte.afficheCarte());
+                    break;
+                case ChatMessage.LOCATION:
+                    writeMsg(flotte.afficheCarte());
+                    writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
+                    getMessageClient();
                     switch (cm.getType()) {
-
-                        case ChatMessage.INSTRUCTION:
-                            writeMsg("-- Un simple message pour l'admin --\n" +
-                                    "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
-                                    "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n" +
-                                    "3. Tapez 'LOCATION' pour placer les bateaux");
+                        case ChatMessage.MANUEL:
+                            writeMsg("D'accord ils vont être placés manuellement");
+                            placeMan(message);
+                            broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                             break;
-                        case ChatMessage.MESSAGE:
-                            boolean confirmation = broadcast(username + ": " + message);
-                            if (confirmation == false) {
-                                String msg = notif + "Désolé. Cette utilisateur n'existe pas." + notif;
-                                writeMsg(msg);
-                            }
-                            break;
-                        case ChatMessage.LOGOUT:
-                            display(username + " s'est déconnecté avec le message LOGOUT.");
-                            keepGoing = false;
-                            break;
-                        case ChatMessage.WHOISIN:
-                            writeMsg("La liste des utilisateur à " + sdf.format(new Date()) + "\n");
-                            // send list of active clients
-                            for (int i = 0; i < al.size(); ++i) {
-                                ClientThread ct = al.get(i);
-                                writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
-                            }
-                            break;
-                        case ChatMessage.LOCATION:
-                            writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
-                            getMessageClient();
-                            switch (cm.getType()) {
-                                case ChatMessage.MANUEL:
-                                    writeMsg("D'accord ils vont être placés manuellement");
-                                    broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
-                                    break;
-                                case ChatMessage.AUTOMATIQUE:
-                                    //mainGame.PlacementBateau();
-                                    flotte.placeBateauAle();
-                                    flotte.afficheFlotte();
-                                    writeMsg(flotte.afficheFlotte());
-                                    flotte.afficheFlotte();
-                                    flotte.afficheCarte();
-                                    writeMsg(" Placement automatique lancer ");
-                                    broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
-                                    break;
-                            }
+                        case ChatMessage.AUTOMATIQUE:
+                            writeMsg(" Placement automatique lancer ");
+                            flotte.placeBateauAle();
+                            writeMsg(flotte.afficheFlotte());
+                            writeMsg(flotte.afficheCarte());
+                            broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                             break;
                     }
+                    break;
+            }
         }
 
-        private void Client1(String message){
+        private void Client1(String message) {
             writeMsg("Vous etes le joueur 1, tapez 'Instruction' pour avoir voir les instructions");
             switch (cm.getType()) {
                 case ChatMessage.INSTRUCTION:
@@ -424,20 +418,20 @@ public class Server {
                         writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
                     }
                     break;
-                        /*case ChatMessage.JOUER:
-                            broadcast(username + " veut jouer");
-                            writeMsg("Voulez vous commencer a jouer ?");
-                            getMessageClient();
-                            switch (cm.getType()) {
-                                case ChatMessage.YES:
-                                    writeMsg("Ok d'accord");
-                                    break;
-                            }
-                            break;*/
+                case ChatMessage.JOUER:
+                    broadcast(username + " veut jouer");
+                    writeMsg("Voulez vous commencer a jouer ?");
+                    getMessageClient();
+                    switch (cm.getType()) {
+                        case ChatMessage.YES:
+                            writeMsg("Ok d'accord");
+                            break;
+                    }
+                    break;
             }
         }
 
-        private void Client2(String message){
+        private void Client2(String message) {
             writeMsg("Vous etes le joueur 2, tapez 'Instruction' pour avoir voir les instructions");
             switch (cm.getType()) {
                 case ChatMessage.INSTRUCTION:
@@ -484,7 +478,172 @@ public class Server {
             }
         }
 
+        private boolean placeMan(String message) {
+            boolean bienFait = false;
+            writeMsg(" Quel bateau souhaiter placer ? \n "
+                    + " - SousMarin -\n "
+                    + " - Torppilleur\n "
+                    + " - Croiseur \n "
+                    + " - Cuirasse \n "
+                    + " - PorteAvillons \n "
+                    + " - Quitter \n ");
+            getMessageClient();
+            boolean test = false;
+            int a = 0;
+            switch (cm.getType()) {
+                case ChatMessage.SOUSMARIN:
+                    test = false;
+                    writeMsg(" Placement de SousMarin ? \n ");
+                    writeMsg(" Placement vertical ou horizontal ? \n ");
+                    getMessageClient();
+                    switch (cm.getType()){
+                        case ChatMessage.VERTICAL:
+                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            break;
+                        case ChatMessage.HORIZONTAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            break;
+                    }
+                    while (!test) {
+                        writeMsg(" Réssayer le placement! \n ");
+                        writeMsg(" Placement vertical ou horizontal ? \n ");
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.VERTICAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                break;
+                            case ChatMessage.HORIZONTAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                break;
+                        }
+                    }
+                    this.flotte.afficheCarte();
+                    return true;
+                case ChatMessage.TORPILLEUR:
+                    test = false;
+                    writeMsg(" Placement de Torpilleur !  \n ");
+                    writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                    switch (cm.getType()){
+                        case ChatMessage.VERTICAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            break;
+                        case ChatMessage.HORIZONTAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            break;
+                    }
+                    while (!test) {
+                        writeMsg(" Réssayer le placement! \n ");
+                        writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.VERTICAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                break;
+                            case ChatMessage.HORIZONTAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                break;
+                        }
+                    }
+                    this.flotte.afficheCarte();
+                    return true;
+                case ChatMessage.CROISEUR:
+                    test = false;
+                    writeMsg(" Placement de Croiseur ! \n ");
+                    writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                    getMessageClient();
+                    switch (cm.getType()){
+                        case ChatMessage.VERTICAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            break;
+                        case ChatMessage.HORIZONTAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            break;
+                    }
+                    while (!test) {
+                        writeMsg(" Réssayer le placement! \n ");
+                        writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.VERTICAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                break;
+                            case ChatMessage.HORIZONTAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                break;
+                        }
+                    }
+                    this.flotte.afficheCarte();
+                    return true;
+                case ChatMessage.CUIRRASE:
+                    test = false;
+                    writeMsg(" Placement de Cuirasse ! \n ");
+                    writeMsg(" Placement vertical: 1 , horisental: 2 ? \n ");
+                    getMessageClient();
+                    switch (cm.getType()){
+                        case ChatMessage.VERTICAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            break;
+                        case ChatMessage.HORIZONTAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            break;
+                    }
+                    while (!test) {
+                        writeMsg(" Réssayer le placement! \n ");
+                        writeMsg(" Placement vertical: 1 ou horisental: 2 ? \n ");
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.VERTICAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                break;
+                            case ChatMessage.HORIZONTAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                break;
+                        }
+                    }
+                    this.flotte.afficheCarte();
+                    return true;
+                case ChatMessage.PORTEAVIONS:
+                    test = false;
+                    writeMsg(" Placement de PorteAvion ? \n ");
+                    writeMsg(" Placement vertical: 1 , horisental 2 ? \n ");
+                    getMessageClient();
+                    switch (cm.getType()){
+                        case ChatMessage.VERTICAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            break;
+                        case ChatMessage.HORIZONTAL:
+                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            break;
+                    }
+                    while (!test) {
+                        writeMsg(" Réssayer le placement! \n ");
+                        writeMsg(" Placement vertical: 1 , horisental: 2 ? \n ");
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.VERTICAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                break;
+                            case ChatMessage.HORIZONTAL:
+                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                break;
+                        }
+                    }
+                    this.flotte.afficheCarte();
+                    return true;
+                case ChatMessage.QUITTER:
+                    writeMsg(" Fin du Manageur\n ");
+                    return true;
+            }
+            return false;
+        }
+
+        private Addresse recupAdr(){
+            int x=0;
+            int y=0;
+            writeMsg(" Rentrez l'abscisse :");
+            getMessageClient();
+            return new Addresse(x,y);
+        }
 
     }
 }
-
