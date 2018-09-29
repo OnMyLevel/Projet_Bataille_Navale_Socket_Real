@@ -29,7 +29,6 @@ public class TimeServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         listThread = new ArrayList<>();
         realGame = new Game();
     }
@@ -102,15 +101,20 @@ public class TimeServer {
 
                         //Une fois reçue, on la traite dans un thread séparé
                         System.out.println("Connexion cliente reçue.");
-                        if(listThread.isEmpty()) {
-                            System.out.println("Connexion cliente reçue.");
-                            Joueur tmp = new Joueur("joueur-"+listThread.size(), "0000", 0,listThread.size());
-                            realGame.ajouerJoueur(tmp);
+
+                        System.out.println("Connexion cliente reçue.");
+                        Joueur tmp = new Joueur("joueur#"+listThread.size(), "0000", 0,listThread.size());
+                        realGame.ajouerJoueur(tmp);
+
+                        Thread t;
+                        if(listThread.size()>=1) {
+                             t = new Thread(new ClientProcessor(client, realGame, realGame.getJoueurs().get(listThread.size())));
+                        }else{
+                             t = new Thread(new ClientProcessor(client, realGame, realGame.getJoueurs().get(0)));
                         }
-                        Thread t = new Thread(new ClientProcessor(client,realGame,realGame.getJoueurs().get(listThread.size())));
                         listThread.add(t);
-                        System.out.println();
                         t.start();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

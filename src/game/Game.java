@@ -13,10 +13,27 @@ public class Game {
     private ArrayList<Joueur> joueurs;
     private Flotte flotte;
     private int score;
+    private int prochainJoueur;
     int ancienNombreJoueur;
+
+    public int getProchainJoueur() {
+        return prochainJoueur;
+    }
+
+    public void setProchainJoueur(int prochainJoueur) {
+        this.prochainJoueur = prochainJoueur;
+    }
+
+    private String messageAttaque;
 
     public int getAncienNombreJoueur() {
         return ancienNombreJoueur;
+    }
+    public String getMessageAttaque() {
+        return messageAttaque;
+    }
+    public void setMessageAttaque(String messageAttaque) {
+        this.messageAttaque = messageAttaque;
     }
 
     public void setAncienNombreJoueur(int ancienNombreJoueru) {
@@ -60,6 +77,8 @@ public class Game {
         this.flotte = new Flotte();
         this.joueurs = new ArrayList<Joueur>();
         this.score = 0;
+        this.prochainJoueur = 0;
+        this.messageAttaque = "";
     }
 
     public Game(ArrayList<Joueur> joueurs, Flotte flotte, int score) {

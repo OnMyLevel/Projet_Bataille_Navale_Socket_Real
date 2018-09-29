@@ -300,7 +300,6 @@ public class FenAdmin extends JFrame implements  ActionListener{
                 bateauInfo = new JOptionPane();
                 bateauInfo.showMessageDialog(null,
                         "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
-                lancerPartie.setEnabled(true);
                 refreshJframe();
             }
 
@@ -374,7 +373,6 @@ public class FenAdmin extends JFrame implements  ActionListener{
                 bateauInfo = new JOptionPane();
                 bateauInfo.showMessageDialog(null,
                         "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
-                lancerPartie.setEnabled(true);
                 nombreDejoueursChange();
                 refreshJframe();
             }
@@ -489,6 +487,7 @@ public class FenAdmin extends JFrame implements  ActionListener{
        this.refreshPanelWest();
        this.refreshPanelEst();
        nombreDejoueursChange();
+       LancerPartie();
        this.repaint();
 
     }
@@ -503,6 +502,12 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
     }
 
+    public void LancerPartie(){
+        if(this.server.getRealGame().getFlotte().getNombreBateau() >4 && this.server.getRealGame().getJoueurs().size() >2){
+            lancerPartie.setEnabled(true);
+        }
+    }
+
     private void refreshPanelWest() {
     }
 
@@ -515,6 +520,7 @@ public class FenAdmin extends JFrame implements  ActionListener{
             bateauInfo = new JOptionPane();
             bateauInfo.showMessageDialog(null,
                     this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()+1)+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+         this.server.getRealGame().setProchainJoueur(this.server.getRealGame().getJoueurs().size());
         }
     }
 

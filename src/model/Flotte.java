@@ -5,13 +5,13 @@ import java.lang.Math;
 
 public class Flotte {
 
-    private static final int NOMBRE_BATEAU = 5;
+    public static final int NOMBRE_BATEAU = 5;
 
-    private static final int SOUSMARIN_TAILLE = 1;
-    private static final int TORPILLEUR_TAILLE = 2;
-    private static final int CROISEUR_TAILLE = 3;
-    private static final int CUIRASSE_TAILLE = 4;
-    private static final int PORTEAVIONS_TAILLE = 5;
+    public static final int SOUSMARIN_TAILLE = 1;
+    public static final int TORPILLEUR_TAILLE = 2;
+    public static final int CROISEUR_TAILLE = 3;
+    public static final int CUIRASSE_TAILLE = 4;
+    public static final int PORTEAVIONS_TAILLE = 5;
 
     private ArrayList<Bateau> compBateau;
     private boolean flotteDet;

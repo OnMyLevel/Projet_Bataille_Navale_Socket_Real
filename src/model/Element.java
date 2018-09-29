@@ -63,7 +63,7 @@ public class Element {
             if(etat=="abime"){
                 s=" * ";
             }else{
-                s="*";
+                s=" * ";
             }
         }
         return s;

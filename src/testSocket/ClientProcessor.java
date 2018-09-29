@@ -10,8 +10,6 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.text.DateFormat;
-import java.util.Date;
 
 public class ClientProcessor implements Runnable{
 
@@ -19,10 +17,9 @@ public class ClientProcessor implements Runnable{
     private PrintWriter writer = null;
     private BufferedInputStream reader = null;
     private Game realGame;
-    private  Joueur joueur;
+    private Joueur joueur;
 
     public ClientProcessor(Socket pSock, Game agame , Joueur joueur){
-
         sock = pSock;
         realGame = agame;
         this.joueur= joueur;
@@ -61,8 +58,6 @@ public class ClientProcessor implements Runnable{
 
                 //On traite la demande du client en fonction de la commande envoyée
                 String toSend = "";
-
-
                 String[] a = response.split(",");
                 System.out.println(a[0].toString());
                 int x = Integer.valueOf(a[0]);
@@ -70,12 +65,34 @@ public class ClientProcessor implements Runnable{
                 int test  = realGame.lanceAttaque( new Addresse(x,y));
                 switch(test){
                     case 0:
-                        toSend = "A l'eau";
+                        toSend = "A l'eau !";
+                        int score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
+                        toSend += " votre score ( "+joueur.getLogin()+") est de : "+score+"\n";
+                        realGame.setMessageAttaque(toSend);
+                        if(realGame.getProchainJoueur() == realGame.getJoueurs().size()-1) {
+                            realGame.setProchainJoueur(0);
+                        }else{
+                            realGame.setProchainJoueur(joueur.getIdGame()+1);
+                        }
+                        toSend+="Prochain joueur "+realGame.getProchainJoueur();
                         break;
                     case 1:
-                        toSend = "Toucher ";
+                        toSend = " Toucher ! \n ";
+                        realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore()+1);
+                        score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
+                        toSend += " votre score ("+joueur.getLogin()+") est de : "+score+"\n";
+                        realGame.setMessageAttaque(toSend);
+                        if(realGame.getProchainJoueur() == realGame.getJoueurs().size()-1) {
+                            realGame.setProchainJoueur(0);
+                        }else{
+                            realGame.setProchainJoueur(joueur.getIdGame()+1);
+                        }
+                        toSend+="Prochain joueur "+realGame.getProchainJoueur();
                         break;
-                    default :
+                    case 3:
+                        closeConnexion=true;
+                        break;
+                    default:
                         toSend = "Commande inconnu !";
                         break;
                 }

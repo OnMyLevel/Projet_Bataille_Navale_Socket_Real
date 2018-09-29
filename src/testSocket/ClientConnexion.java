@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
 import java.util.Scanner;
 
 public class ClientConnexion implements Runnable{
@@ -17,7 +16,7 @@ public class ClientConnexion implements Runnable{
     //Notre liste de commandes. Le serveur nous répondra différemment selon la commande utilisée.
     private String[] listCommands = {"FULL", "DATE", "HOUR", "NONE"};
     private static int count = 0;
-    private String name = "Client-";
+    private String name = "Player-";
 
     public ClientConnexion(String host, int port){
         name += ++count;
@@ -51,10 +50,10 @@ public class ClientConnexion implements Runnable{
                 writer.write(commande);
                 //TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS AU SERVEUR
                 writer.flush();
-                System.out.println("Commande " + commande + " envoyée au serveur");
+                System.out.println("L'attaque sur la position " + commande + ": ");
                 //On attend la réponse
                 String response = read();
-                System.out.println("\t * " + name + " : Réponse reçue " + response);
+                System.out.println("\t * : "+" Réponse reçue " + "\n "+response);
 
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -74,7 +73,7 @@ public class ClientConnexion implements Runnable{
 
     //Méthode qui permet d'envoyer une attaque
     private String getCommand(){
-        System.out.println(" Tapez un commande \n ");
+        System.out.println(" Tapez les coordonées de la case \n ");
         Scanner sc = new Scanner(System.in);
         String x = sc.next();
         return  x; /*listCommands[rand.nextInt(listCommands.length)];*/
