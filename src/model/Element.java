@@ -3,10 +3,12 @@ package model;
 public class Element {
     private Addresse adr;
     private String etat;
+    private String modif;
 
     public Element(int i, int j) {
         this.adr = new Addresse(i,j);
         etat="intact";
+        modif=" # ";
     }
 
     public Element(int i, int j,String s) {
@@ -15,8 +17,13 @@ public class Element {
     }
 
     public Element() {
+        etat="intact";
+    }
+
+    public Element(String motif) {
 
         etat="intact";
+        this.modif = motif;
     }
 
     public int getabcisse(){
@@ -32,9 +39,11 @@ public class Element {
         if(this.adr.equal(b)) {
             if(etat=="intact"){
                 etat="abime";
+                this.modif=" * ";
                 a=true;
             }else if(etat=="abime")
                 etat="detruit";
+                this.modif=" ! ";
                 a=true;
         }
         return a;
@@ -52,21 +61,12 @@ public class Element {
     }
 
     public void setEtat(String a){
+
         etat=a;
     }
 
     public String toString() {
-        String s;
-        if(etat.compareTo("intact")==0){
-            s=" # ";
-        }else{
-            if(etat=="abime"){
-                s=" * ";
-            }else{
-                s=" ! ";
-            }
-        }
-        return s;
+        return this.modif;
     }
 
     public void setAdresse(Addresse b) {

@@ -133,6 +133,7 @@ public class TimeServer {
     }
 
     public void close(){
+
         isRunning = false;
     }
 }

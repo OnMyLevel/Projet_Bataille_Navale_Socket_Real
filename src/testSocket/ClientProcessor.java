@@ -65,7 +65,7 @@ public class ClientProcessor implements Runnable{
                 int test  = realGame.lanceAttaque( new Addresse(x,y));
                 switch(test){
                     case 0:
-                        toSend = "A l'eau !";
+                        toSend = "2, A l'eau !";
                         int score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
                         toSend += " votre score ( "+joueur.getLogin()+") est de : "+score+"\n";
                         realGame.setMessageAttaque(toSend);
@@ -74,10 +74,10 @@ public class ClientProcessor implements Runnable{
                         }else{
                             realGame.setProchainJoueur(joueur.getIdGame()+1);
                         }
-                        toSend+="Prochain joueur "+realGame.getProchainJoueur();
+                        toSend+="Prochain joueur, "+realGame.getProchainJoueur();
                         break;
                     case 1:
-                        toSend = " Toucher ! \n ";
+                        toSend = "1, Toucher ! \n ";
                         realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore()+1);
                         score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
                         toSend += " votre score ("+joueur.getLogin()+") est de : "+score+"\n";
@@ -87,7 +87,7 @@ public class ClientProcessor implements Runnable{
                         }else{
                             realGame.setProchainJoueur(joueur.getIdGame()+1);
                         }
-                        toSend+="Prochain joueur "+realGame.getProchainJoueur();
+                        toSend+="Prochain joueur, "+realGame.getProchainJoueur();
                         break;
                     case 3:
                         closeConnexion=true;

@@ -12,6 +12,16 @@ public class Joueur {
     private  int score;
     private int idGame;
 
+    public int getNombreAttaques() {
+        return nombreAttaques;
+    }
+
+    public void setNombreAttaques(int nombreAttaques) {
+        this.nombreAttaques = nombreAttaques;
+    }
+
+    private int nombreAttaques;
+
     private Carte mapsJoueur;
 
     public Carte getMapsJoueur() {
@@ -38,6 +48,10 @@ public class Joueur {
         this.mapsJoueur = new Carte();
     }
 
+    public Joueur(){
+        this.mapsJoueur = new Carte();
+    }
+
     public int getIdGame() {
 
         return idGame;
@@ -56,8 +70,6 @@ public class Joueur {
                 '}';
     }
 
-    public Joueur() {
-    }
 
     public Joueur(String login, String password) {
         this.login = login;
