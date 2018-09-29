@@ -208,13 +208,12 @@ public class Flotte {
 
     public boolean placeAleSousMarin(){
         boolean a=false;
-        int i= 0;
         while(!a){
-            int x=(int) (Math.random() * 9 );
-            int y=(int) (Math.random() * 9 );
+            int x=(int) (Math.random() * 9);
+            int y=(int) (Math.random() * 9);
             int ale= (int) (Math.random() * 2);
             boolean vertical = false;
-            if(x>1 && y>1) {
+            if(ale>0 && x> 0 && y>0){
                 if (ale > 0) {
                     a = this.placeSousmarin(new Addresse(x, y), true);
                 } else {
@@ -227,12 +226,12 @@ public class Flotte {
 
     public boolean placeAlePorteAVion(){
         boolean a=false;
-        int i= 0;
         while(!a){
-            int x=(int) (Math.random() * 9 );
-            int y=(int) (Math.random() * 9 );
+            int x=(int) (Math.random() * 9);
+            int y=(int) (Math.random() * 9);
             int ale= (int) (Math.random() * 2);
-            if(ale>0){
+            boolean vertical = false;
+            if(ale>0 && x>0 && y>0 ){
                 a = this.placePorteAvion(new Addresse(x,y),true);
             }else{
                 a = this.placePorteAvion(new Addresse(x,y),false);
@@ -243,12 +242,13 @@ public class Flotte {
 
     public boolean placeAleCroiseur(){
         boolean a=false;
-        int i= 0;
+
         while(!a){
-            int x=(int) (Math.random() * 9 );
-            int y=(int) (Math.random() * 9 );
+            int x=(int) (Math.random() * 9);
+            int y=(int) (Math.random() * 9);
             int ale= (int) (Math.random() * 2);
-            if(ale>0){
+            boolean vertical = false;
+            if(ale>0 && x> 0 && y>0){
                 a = this.placeCroiseur(new Addresse(x,y),true);
             }else{
                 a = this.placeCroiseur(new Addresse(x,y),false);
@@ -260,12 +260,13 @@ public class Flotte {
     public boolean placeAleTorpilleur(){
         boolean a=false;
         int i= 0;
+
         while(!a){
-            int x=(int) (Math.random() * 9 );
+            int x=(int) (Math.random() * 9);
             int y=(int) (Math.random() * 9);
             int ale= (int) (Math.random() * 2);
             boolean vertical = false;
-            if(ale>0){
+            if(ale>0 && x> 0 && y>0){
                 a = this.placeTorpilleur(new Addresse(x,y),true);
             }else{
                 a = this.placeTorpilleur(new Addresse(x,y),false);
@@ -275,13 +276,16 @@ public class Flotte {
     }
 
     public boolean placeAleCuirasse(){
+
         boolean a=false;
         int i= 0;
+
         while(!a){
-            int x=(int) (Math.random() * 9 );
+            int x=(int) (Math.random() * 9);
             int y=(int) (Math.random() * 9);
             int ale= (int) (Math.random() * 2);
-            if(ale>0){
+            boolean vertical = false;
+            if(ale>0 && x> 0 && y>0){
                 a = this.placeCuirasse(new Addresse(x,y),true);
             }else{
                 a = this.placeCuirasse(new Addresse(x,y),false);

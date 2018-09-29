@@ -112,6 +112,7 @@ public class FenAdmin extends JFrame implements  ActionListener{
                 if(j==0 && i==0){
                     this.tab[i][j].setBackground(Color.white);
                 }
+                /*
                 else if(i==0){
                     this.tab[i][j].setText(j+"");
                     this.tab[i][j].setBackground(Color.white);
@@ -119,14 +120,14 @@ public class FenAdmin extends JFrame implements  ActionListener{
                 else if(j==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
-                }
+                }*/
                 else{
-                    if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="#") {
+                    if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
                         this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.red);
                         this.tab[i][j].setText(i+","+j);
                     }
-                    else if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()=="*") {
+                    else if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" * ") {
                         this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setBackground(Color.magenta);
                         this.tab[i][j].setText(i+","+j);
@@ -538,6 +539,8 @@ public class FenAdmin extends JFrame implements  ActionListener{
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
                 }
+
+                /*
                 else if(i==0){
                     this.tab[i][j].setText(j+"");
                     this.tab[i][j].setBackground(Color.white);
@@ -545,7 +548,8 @@ public class FenAdmin extends JFrame implements  ActionListener{
                 else if(j==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
-                }
+                }*/
+
                 else{
                     if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
                         //this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
