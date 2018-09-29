@@ -235,31 +235,31 @@ public class Client  {
                 client.sendMessage(new ChatMessage(ChatMessage.LOCATION,""));
             }
             else if (msg.equalsIgnoreCase("1")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.UN, ""));
             }
             else if (msg.equalsIgnoreCase("2")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.DEUX, ""));
             }
             else if (msg.equalsIgnoreCase("3")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.TROIS, ""));
             }
             else if (msg.equalsIgnoreCase("4")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.QUATRE, ""));
             }
             else if (msg.equalsIgnoreCase("5")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.CINQ, ""));
             }
             else if (msg.equalsIgnoreCase("6")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.SIX, ""));
             }
             else if (msg.equalsIgnoreCase("7")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.SEPT, ""));
             }
             else if (msg.equalsIgnoreCase("8")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.HUIT, ""));
             }
             else if (msg.equalsIgnoreCase("9")) {
-                client.sendMessage(new ChatMessage(ChatMessage.NUMBER, ""));
+                client.sendMessage(new ChatMessage(ChatMessage.NEUF, ""));
             }
             else if (msg.equalsIgnoreCase("vertical")){
                 client.sendMessage(new ChatMessage(ChatMessage.VERTICAL,""));

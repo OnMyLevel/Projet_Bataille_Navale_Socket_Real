@@ -18,6 +18,7 @@ public class ChatMessage implements Serializable {
     static final String MANUEL = "manuel", AUTOMATIQUE = "automatique", INSTRUCTION = "instruction", LOCATION = "location", AFFICHECARTE = "affichercarte";
     static final String SOUSMARIN = "sousmarin", TORPILLEUR = "torpilleur", CROISEUR = "croisseur", CUIRRASE = "cuirrase", PORTEAVIONS = "porteavions", QUITTER = "quitter", HORIZONTAL = "horizontal", VERTICAL = "verical";
     static final String NUMBER = "1", JOUER = "jouer";
+    static final String UN="1",DEUX="2",TROIS="3",QUATRE="4",CINQ="5",SIX="6",SEPT="7",HUIT="8",NEUF="9";
     private String type;
     private String message;
 

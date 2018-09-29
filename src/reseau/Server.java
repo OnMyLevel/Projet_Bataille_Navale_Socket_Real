@@ -501,7 +501,7 @@ public class Server {
                             test = this.flotte.placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            test = this.flotte.placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -510,10 +510,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                test = this.flotte.placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                test = this.flotte.placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
@@ -523,12 +523,13 @@ public class Server {
                     test = false;
                     writeMsg(" Placement de Torpilleur !  \n ");
                     writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                    getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            test = this.flotte.placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            test = this.flotte.placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -537,10 +538,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                test = this.flotte.placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                test = this.flotte.placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
@@ -553,10 +554,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            test = this.flotte.placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            test = this.flotte.placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -565,10 +566,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                test = this.flotte.placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                test = this.flotte.placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
@@ -581,10 +582,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            test = this.flotte.placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            test = this.flotte.placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -593,10 +594,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                test = this.flotte.placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                test = this.flotte.placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
@@ -609,10 +610,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                            test = this.flotte.placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                            test = this.flotte.placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -621,10 +622,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), true);
+                                test = this.flotte.placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.mainGame.getFlotte().placeSousmarin(mainGame.recupAdr(), false);
+                                test = this.flotte.placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
@@ -642,6 +643,67 @@ public class Server {
             int y=0;
             writeMsg(" Rentrez l'abscisse :");
             getMessageClient();
+            switch (cm.getType()){
+                case ChatMessage.UN:
+                    x=1;
+                    break;
+                case ChatMessage.DEUX:
+                    x=2;
+                    break;
+                case ChatMessage.TROIS:
+                    x=3;
+                    break;
+                case ChatMessage.QUATRE:
+                    x=4;
+                    break;
+                case ChatMessage.CINQ:
+                    x=5;
+                    break;
+                case ChatMessage.SIX:
+                    x=6;
+                    break;
+                case ChatMessage.SEPT:
+                    x=7;
+                    break;
+                case ChatMessage.HUIT:
+                    x=8;
+                    break;
+                case ChatMessage.NEUF:
+                    x=9;
+                    break;
+            }
+
+            writeMsg(" Rentrez l'ordonnées :");
+            getMessageClient();
+            switch (cm.getType()){
+                case ChatMessage.UN:
+                    y=1;
+                    break;
+                case ChatMessage.DEUX:
+                    y=2;
+                    break;
+                case ChatMessage.TROIS:
+                    y=3;
+                    break;
+                case ChatMessage.QUATRE:
+                    y=4;
+                    break;
+                case ChatMessage.CINQ:
+                    y=5;
+                    break;
+                case ChatMessage.SIX:
+                    y=6;
+                    break;
+                case ChatMessage.SEPT:
+                    y=7;
+                    break;
+                case ChatMessage.HUIT:
+                    y=8;
+                    break;
+                case ChatMessage.NEUF:
+                    y=9;
+                    break;
+            }
             return new Addresse(x,y);
         }
 
