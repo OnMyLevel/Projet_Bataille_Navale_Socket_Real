@@ -35,11 +35,13 @@ public class Element {
         return this.adr.getAdrColone();
     }
     public boolean toucheR(Addresse b) {
+
         boolean a= false;
         if(this.adr.equal(b)) {
             if(etat=="intact"){
                 etat="abime";
                 this.modif=" * ";
+                System.out.println("toucher");
                 a=true;
             }else if(etat=="abime")
                 etat="detruit";

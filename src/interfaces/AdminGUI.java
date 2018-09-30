@@ -53,13 +53,14 @@ public class AdminGUI extends JFrame implements  ActionListener{
         this.setBounds(x, y, w, h);
         this.setResizable(false);
         this.setVisible(true);
-        //this.getPanelCenter().getAccessibleContext().getAccessibleChild(1).
+
     }
 
     public void initGame(){
         this.server = new TimeServer();
         this.server.open();
         this.server.setRealGame( new  Game());
+        this.server.getRealGame().setAncienNombreJoueur(0);
     }
 
     public AdminGUI() {
@@ -517,8 +518,9 @@ public class AdminGUI extends JFrame implements  ActionListener{
         if(this.server.getRealGame().getJoueurs().size() > this.server.getRealGame().getAncienNombreJoueur()){
             Info = new JOptionPane();
             Info.showMessageDialog(null,
-                    this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()+1)+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+                    this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()).getLogin()+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
          this.server.getRealGame().setProchainJoueur(this.server.getRealGame().getJoueurs().size());
+            this.server.getRealGame().setAncienNombreJoueur(this.server.getRealGame().getJoueurs().size());
         }
     }
 

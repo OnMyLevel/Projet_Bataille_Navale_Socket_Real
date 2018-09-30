@@ -38,6 +38,8 @@ public class JoueurGUI extends JFrame implements  ActionListener{
     private JButton   valider;
     private JOptionPane Info;
     private JTextArea infoGenerale;
+    private  int exX;
+    private  int exY;
 
 
     public JoueurGUI(String titre, int x, int y, int w, int h, Joueur clientJoueur) {
@@ -148,10 +150,7 @@ public class JoueurGUI extends JFrame implements  ActionListener{
         pan.setLayout(new GridLayout(0,1));
         infoGenerale = new JTextArea ( 16, 25 );
         infoGenerale.setEditable ( false ); // set textArea non-editable
-        JScrollPane scroll = new JScrollPane ( infoGenerale );
-        scroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
-        pan.add(scroll);
-
+        pan.add(infoGenerale);
         return pan;
     }
 
@@ -246,28 +245,25 @@ public class JoueurGUI extends JFrame implements  ActionListener{
         }
 
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Valider Placement");
-            if (getCoord.toString() != null) {
+
+            if(getCoord.getText() != null && getCoord.getText() !=" " ) {
 
                 client.setCoorAttaque(getCoord.getText());
                 String[] tab = getCoord.getText().split(",");
                 int x = Integer.valueOf(tab[0]);
                 int y = Integer.valueOf(tab[1]);
-                if(client.getToucher()==1){
-                    client.getJoueur().setScore(client.getJoueur().getScore()+1);
-                    client.getJoueur().getMapsJoueur().setElementT(new Element(" X "),new Addresse(x,y));
-                }
+                exX = x;
+                exY= y;
                 gameRerefresh();
             }
 
             if (client.getJoueur().getIdGame() == 1) {
-                valider.setEnabled(false);
-                //Boîte du message d'information
                 Info = new JOptionPane();
                 Info.showMessageDialog(null,
                         " Avoue de jouer", "Information", JOptionPane.INFORMATION_MESSAGE);
                 gameRerefresh();
             }
+            getCoord.setText("0,0");
         }
     }
 
@@ -328,7 +324,15 @@ public class JoueurGUI extends JFrame implements  ActionListener{
     }
 
     public void gameRerefresh(){
-
+        if(client.getToucher()==1){
+            System.out.println("ici 4");
+            client.getJoueur().setScore(client.getJoueur().getScore()+1);
+            client.getJoueur().getMapsJoueur().SuprimerE(new Addresse(exX,exY));
+            client.getJoueur().getMapsJoueur().PlacerElement2(new Element(" X "),new Addresse(exX,exY));
+        }else{
+            client.getJoueur().getMapsJoueur().SuprimerE(new Addresse(exX,exY));
+            client.getJoueur().getMapsJoueur().PlacerElement2(new Element(" # "),new Addresse(exX,exY));
+        }
     }
 
     private void refreshPanelNorth() {
@@ -340,7 +344,7 @@ public class JoueurGUI extends JFrame implements  ActionListener{
 
     private void refreshPanelWest() {
         this.infoGenerale.setText(this.client.getJoueur().toString());
-        this.infoGenerale.setText(this.infoGenerale.getText() + this.client.getRetourAttaque());
+        this.infoGenerale.setText(this.client.getRetourAttaque());
     }
 
     private void refreshPanelEst() {
@@ -377,14 +381,14 @@ public class JoueurGUI extends JFrame implements  ActionListener{
                     }  else if(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString()==" ! ") {
                         // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
-                        this.tab[i][j].setBackground(Color.black);
+                        this.tab[i][j].setBackground(Color.green);
                         //this.tab[i][j].setText(i+","+j);
                     }
                     else if(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString()==" X ") {
                         // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.yellow);
-                        //this.tab[i][j].setText(i+","+j);
+                        this.tab[i][j].setText(i+","+j);
                     }
                     else {
                         this.tab[i][j].setText(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString());

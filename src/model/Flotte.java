@@ -186,8 +186,8 @@ public class Flotte {
         while (i <this.compBateau.size()){
             for (int j = 0; j < this.compBateau.get(i).getElement().length;j++) {
                 if (this.compBateau.get(i).getElement()[j].toucheR(t)) {
-                    System.out.println("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
-                    this.maps.afficheCarte();
+                    System.out.println("Vous avez couler un bateau à l'adresse  " + t.toString() + "");
+                    //this.maps.afficheCarte();
                     this.bateauDetruit();
                     return 1;
                 }

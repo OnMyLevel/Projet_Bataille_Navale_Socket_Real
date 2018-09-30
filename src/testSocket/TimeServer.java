@@ -87,7 +87,7 @@ public class TimeServer {
 
 
     //On lance notre serveur
-    public void open(){
+   /* public void open(){
 
         //Toujours dans un thread à part vu qu'il est dans une boucle infinie
         Thread t = new Thread(new Runnable(){
@@ -130,9 +130,59 @@ public class TimeServer {
         });
 
         t.start();
+    }*/
+
+
+
+
+    //On lance notre serveur
+    public void open() {
+
+        //Toujours dans un thread à part vu qu'il est dans une boucle infinie
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                int i = 0;
+                while (isRunning == true) {
+
+                    try {
+                        //On attend une connexion d'un client
+                        Socket client = server.accept();
+
+                        //Une fois reçue, on la traite dans un thread séparé
+                        System.out.println("Connexion cliente reçue.");
+
+                        System.out.println("Connexion cliente reçue.");
+                        Joueur tmp = new Joueur("joueur#" + listThread.size(), "0000", 0, listThread.size());
+                        realGame.ajouerJoueur(tmp);
+
+                        Thread t;
+                        if (listThread.size() >= 1) {
+                            t = new Thread(new ClientProcessor(client, realGame, realGame.getJoueurs().get(listThread.size())));
+                        } else {
+                            t = new Thread(new ClientProcessor(client, realGame, realGame.getJoueurs().get(0)));
+                        }
+                        listThread.add(t);
+                        t.start();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    server = null;
+                }
+            }
+        });
+
+        t.start();
     }
 
-    public void close(){
+
+        public void close(){
 
         isRunning = false;
     }
