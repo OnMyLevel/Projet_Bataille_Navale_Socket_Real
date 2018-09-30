@@ -366,7 +366,6 @@ public class Server {
                     }
                     break;
                 case ChatMessage.AFFICHECARTE:
-                    writeMsg("affichercarte");
                     writeMsg("\n" + flotte.afficheCarte());
                     break;
                 case ChatMessage.LOCATION:
@@ -375,8 +374,19 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()) {
                         case ChatMessage.MANUEL:
-                            writeMsg("D'accord ils vont être placés manuellement");
-                            placeMan(message);
+                            writeMsg("Vous devez placez 5 bateaux");
+                            for(int i=5; i>0;) {
+                                placeMan(message);
+                                if(Objects.equals(placeMan(message), false)){
+                                    i=0;
+                                    break;
+                                }
+                                else if(Objects.equals(placeMan(message),true)){
+                                    i--;
+                                    writeMsg("il vous reste encore "+ i +" bateaux a placer");
+                                }
+                            }
+                            writeMsg("Voici le placement final des bateaux \n"+flotte.afficheCarte());
                             broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                             break;
                         case ChatMessage.AUTOMATIQUE:
@@ -481,19 +491,19 @@ public class Server {
         private boolean placeMan(String message) {
             boolean bienFait = false;
             writeMsg(" Quel bateau souhaiter placer ? \n "
-                    + " - SousMarin -\n "
-                    + " - Torppilleur\n "
-                    + " - Croiseur \n "
-                    + " - Cuirasse \n "
-                    + " - PorteAvillons \n "
-                    + " - Quitter \n ");
+                    + " - SousMarin - (1 case)\n "
+                    + " - Torpilleur -(2 cases)\n "
+                    + " - Croiseur - (3 cases)\n "
+                    + " - Cuirasse - (4 cases)\n "
+                    + " - PorteAvions -(5 cases)\n "
+                    + " - Quitter -\n ");
             getMessageClient();
             boolean test = false;
             int a = 0;
             switch (cm.getType()) {
                 case ChatMessage.SOUSMARIN:
                     test = false;
-                    writeMsg(" Placement de SousMarin ? \n ");
+                    writeMsg(" Placement de SousMarin ? ");
                     writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
@@ -517,123 +527,128 @@ public class Server {
                                 break;
                         }
                     }
-                    this.flotte.afficheCarte();
+                    writeMsg("\n"+flotte.afficheCarte());
                     return true;
+
                 case ChatMessage.TORPILLEUR:
                     test = false;
                     writeMsg(" Placement de Torpilleur !  \n ");
-                    writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                    writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            test = this.flotte.placeTorpilleur(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), false);
+                            test = this.flotte.placeTorpilleur(recupAdr(), false);
                             break;
                     }
                     while (!test) {
                         writeMsg(" Réssayer le placement! \n ");
-                        writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                        writeMsg(" Placement vertical ou horizontal ? \n ");
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), true);
+                                test = this.flotte.placeTorpilleur(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), false);
+                                test = this.flotte.placeTorpilleur(recupAdr(), false);
                                 break;
                         }
                     }
-                    this.flotte.afficheCarte();
+                    writeMsg("\n"+flotte.afficheCarte());
                     return true;
+
                 case ChatMessage.CROISEUR:
                     test = false;
                     writeMsg(" Placement de Croiseur ! \n ");
-                    writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                    writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            test = this.flotte.placeCroiseur(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), false);
+                            test = this.flotte.placeCroiseur(recupAdr(), false);
                             break;
                     }
                     while (!test) {
                         writeMsg(" Réssayer le placement! \n ");
-                        writeMsg(" Placement vertical - 1 ou horisental - 2 ? \n ");
+                        writeMsg(" Placement vertical ou horizontal ? \n ");
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), true);
+                                test = this.flotte.placeCroiseur(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), false);
+                                test = this.flotte.placeCroiseur(recupAdr(), false);
                                 break;
                         }
                     }
-                    this.flotte.afficheCarte();
+                    writeMsg("\n"+flotte.afficheCarte());
                     return true;
-                case ChatMessage.CUIRRASE:
+
+                case ChatMessage.CUIRASE:
                     test = false;
                     writeMsg(" Placement de Cuirasse ! \n ");
-                    writeMsg(" Placement vertical: 1 , horisental: 2 ? \n ");
+                    writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            test = this.flotte.placeCuirasse(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), false);
+                            test = this.flotte.placeCuirasse(recupAdr(), false);
                             break;
                     }
                     while (!test) {
                         writeMsg(" Réssayer le placement! \n ");
-                        writeMsg(" Placement vertical: 1 ou horisental: 2 ? \n ");
+                        writeMsg(" Placement vertical ou horizontal ? \n ");
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), true);
+                                test = this.flotte.placeCuirasse(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), false);
+                                test = this.flotte.placeCuirasse(recupAdr(), false);
                                 break;
                         }
                     }
-                    this.flotte.afficheCarte();
+                    writeMsg("\n"+flotte.afficheCarte());
                     return true;
+
                 case ChatMessage.PORTEAVIONS:
                     test = false;
                     writeMsg(" Placement de PorteAvion ? \n ");
-                    writeMsg(" Placement vertical: 1 , horisental 2 ? \n ");
+                    writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            test = this.flotte.placePorteAvion(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), false);
+                            test = this.flotte.placePorteAvion(recupAdr(), false);
                             break;
                     }
                     while (!test) {
                         writeMsg(" Réssayer le placement! \n ");
-                        writeMsg(" Placement vertical: 1 , horisental: 2 ? \n ");
+                        writeMsg(" Placement vertical ou horizontal ? \n ");
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), true);
+                                test = this.flotte.placePorteAvion(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), false);
+                                test = this.flotte.placePorteAvion(recupAdr(), false);
                                 break;
                         }
                     }
-                    this.flotte.afficheCarte();
+                    writeMsg("\n"+flotte.afficheCarte());
                     return true;
+
                 case ChatMessage.QUITTER:
                     writeMsg(" Fin du Manageur\n ");
-                    return true;
+                    return false;
             }
             return false;
         }
@@ -641,7 +656,7 @@ public class Server {
         private Addresse recupAdr(){
             int x=0;
             int y=0;
-            writeMsg(" Rentrez l'abscisse :");
+            writeMsg(" Rentrez l'abscisse ↕ :");
             getMessageClient();
             switch (cm.getType()){
                 case ChatMessage.UN:
@@ -673,7 +688,7 @@ public class Server {
                     break;
             }
 
-            writeMsg(" Rentrez l'ordonnées :");
+            writeMsg(" Rentrez l'ordonnées ↔ :");
             getMessageClient();
             switch (cm.getType()){
                 case ChatMessage.UN:

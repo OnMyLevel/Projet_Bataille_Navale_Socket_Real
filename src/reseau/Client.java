@@ -194,26 +194,26 @@ public class Client  {
             else if(msg.equalsIgnoreCase("CROISEUR")){
                 client.sendMessage(new ChatMessage(ChatMessage.CROISEUR,""));
             }
-            else if(msg.equalsIgnoreCase("SOUSMARIN")){
+            else if(msg.equalsIgnoreCase("SOUS MARIN")){
                 client.sendMessage(new ChatMessage(ChatMessage.SOUSMARIN,""));
             }
             else if(msg.equalsIgnoreCase("TORPILLEUR")){
                 client.sendMessage(new ChatMessage(ChatMessage.TORPILLEUR,""));
             }
             else if(msg.equalsIgnoreCase("CUIRASSE")){
-                client.sendMessage(new ChatMessage(ChatMessage.CUIRRASE,""));
+                client.sendMessage(new ChatMessage(ChatMessage.CUIRASE,""));
             }
-            else if(msg.equalsIgnoreCase("PORTEAVIONS")){
+            else if(msg.equalsIgnoreCase("PORTE AVIONS")){
                 client.sendMessage(new ChatMessage(ChatMessage.PORTEAVIONS,""));
             }
             else if(msg.equalsIgnoreCase("QUITTER")){
                 client.sendMessage(new ChatMessage(ChatMessage.QUITTER,""));
             }
-            else if(msg.equalsIgnoreCase("AFFICHERCARTE")){
+            else if(msg.equalsIgnoreCase("AFFICHER CARTE")){
                 client.sendMessage(new ChatMessage(ChatMessage.AFFICHECARTE,""));
             }
             // message to check who are present in chatroom
-            else if(msg.equalsIgnoreCase("WHOISIN")) {
+            else if(msg.equalsIgnoreCase("WHO IS IN")) {
                 client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
             }
             else if(msg.equalsIgnoreCase("JOUER")) {
@@ -261,10 +261,10 @@ public class Client  {
             else if (msg.equalsIgnoreCase("9")) {
                 client.sendMessage(new ChatMessage(ChatMessage.NEUF, ""));
             }
-            else if (msg.equalsIgnoreCase("vertical")){
+            else if (msg.equalsIgnoreCase("VERTICAL")){
                 client.sendMessage(new ChatMessage(ChatMessage.VERTICAL,""));
             }
-            else if(msg.equalsIgnoreCase("horizontal")){
+            else if(msg.equalsIgnoreCase("HORIZONTAL")){
                 client.sendMessage(new ChatMessage(ChatMessage.HORIZONTAL,""));
             }
             // regular text message
