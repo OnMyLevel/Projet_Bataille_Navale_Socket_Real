@@ -149,7 +149,7 @@ public class Carte {
                 }
             }
             System.out.println("|");
-            s+="|";
+            s+="|"+"\n";
         }
         System.out.print(" ");
         s+=" ";

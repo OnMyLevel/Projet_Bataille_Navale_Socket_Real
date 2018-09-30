@@ -186,21 +186,37 @@ public class Client  {
             System.out.print("> ");
             // read message from user
             String msg = scan.nextLine();
-            // logout if message is LOGOUT
-            /*if(msg.equalsIgnoreCase("instruction")){
-                System.out.println("Instructions:");
-                System.out.println("1. Simply type the message to send broadcast to all active clients");
-                System.out.println("2. Type 'WHOISIN' without quotes to see list of active clients");
-                System.out.println("3. Type 'LOGOUT' without quotes to logoff from server");
-                System.out.println("4. Type 'LOCATION' without quotes to Start games");
-            }
-            else */
+
             if(msg.equalsIgnoreCase("LOGOUT")) {
                 client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
                 break;
             }
+            else if (msg.equalsIgnoreCase("START")){
+                client.sendMessage(new ChatMessage(ChatMessage.START,""));
+            }
+            else if(msg.equalsIgnoreCase("CROISEUR")){
+                client.sendMessage(new ChatMessage(ChatMessage.CROISEUR,""));
+            }
+            else if(msg.equalsIgnoreCase("SOUS MARIN")){
+                client.sendMessage(new ChatMessage(ChatMessage.SOUSMARIN,""));
+            }
+            else if(msg.equalsIgnoreCase("TORPILLEUR")){
+                client.sendMessage(new ChatMessage(ChatMessage.TORPILLEUR,""));
+            }
+            else if(msg.equalsIgnoreCase("CUIRASSE")){
+                client.sendMessage(new ChatMessage(ChatMessage.CUIRASE,""));
+            }
+            else if(msg.equalsIgnoreCase("PORTE AVIONS")){
+                client.sendMessage(new ChatMessage(ChatMessage.PORTEAVIONS,""));
+            }
+            else if(msg.equalsIgnoreCase("QUITTER")){
+                client.sendMessage(new ChatMessage(ChatMessage.QUITTER,""));
+            }
+            else if(msg.equalsIgnoreCase("AFFICHER CARTE")){
+                client.sendMessage(new ChatMessage(ChatMessage.AFFICHECARTE,""));
+            }
             // message to check who are present in chatroom
-            else if(msg.equalsIgnoreCase("WHOISIN")) {
+            else if(msg.equalsIgnoreCase("WHO IS IN")) {
                 client.sendMessage(new ChatMessage(ChatMessage.WHOISIN, ""));
             }
             else if(msg.equalsIgnoreCase("JOUER")) {
@@ -220,6 +236,39 @@ public class Client  {
             }
             else if(msg.equalsIgnoreCase("LOCATION")){
                 client.sendMessage(new ChatMessage(ChatMessage.LOCATION,""));
+            }
+            else if (msg.equalsIgnoreCase("1")) {
+                client.sendMessage(new ChatMessage(ChatMessage.UN, ""));
+            }
+            else if (msg.equalsIgnoreCase("2")) {
+                client.sendMessage(new ChatMessage(ChatMessage.DEUX, ""));
+            }
+            else if (msg.equalsIgnoreCase("3")) {
+                client.sendMessage(new ChatMessage(ChatMessage.TROIS, ""));
+            }
+            else if (msg.equalsIgnoreCase("4")) {
+                client.sendMessage(new ChatMessage(ChatMessage.QUATRE, ""));
+            }
+            else if (msg.equalsIgnoreCase("5")) {
+                client.sendMessage(new ChatMessage(ChatMessage.CINQ, ""));
+            }
+            else if (msg.equalsIgnoreCase("6")) {
+                client.sendMessage(new ChatMessage(ChatMessage.SIX, ""));
+            }
+            else if (msg.equalsIgnoreCase("7")) {
+                client.sendMessage(new ChatMessage(ChatMessage.SEPT, ""));
+            }
+            else if (msg.equalsIgnoreCase("8")) {
+                client.sendMessage(new ChatMessage(ChatMessage.HUIT, ""));
+            }
+            else if (msg.equalsIgnoreCase("9")) {
+                client.sendMessage(new ChatMessage(ChatMessage.NEUF, ""));
+            }
+            else if (msg.equalsIgnoreCase("VERTICAL")){
+                client.sendMessage(new ChatMessage(ChatMessage.VERTICAL,""));
+            }
+            else if(msg.equalsIgnoreCase("HORIZONTAL")){
+                client.sendMessage(new ChatMessage(ChatMessage.HORIZONTAL,""));
             }
             // regular text message
             else {
