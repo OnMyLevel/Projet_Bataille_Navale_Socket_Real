@@ -191,6 +191,9 @@ public class Client  {
                 client.sendMessage(new ChatMessage(ChatMessage.LOGOUT, ""));
                 break;
             }
+            else if (msg.equalsIgnoreCase("START")){
+                client.sendMessage(new ChatMessage(ChatMessage.START,""));
+            }
             else if(msg.equalsIgnoreCase("CROISEUR")){
                 client.sendMessage(new ChatMessage(ChatMessage.CROISEUR,""));
             }

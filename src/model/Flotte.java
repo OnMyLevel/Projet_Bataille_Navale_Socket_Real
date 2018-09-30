@@ -13,9 +13,9 @@ public class Flotte {
     public static final int CUIRASSE_TAILLE = 4;
     public static final int PORTEAVIONS_TAILLE = 5;
 
-    private ArrayList<Bateau> compBateau;
-    private boolean flotteDet;
-    private Carte maps;
+    public ArrayList<Bateau> compBateau;
+    public boolean flotteDet;
+    public Carte maps;
 
     public Flotte() {
         this.flotteDet = false;

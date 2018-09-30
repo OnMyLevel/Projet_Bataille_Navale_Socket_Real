@@ -3,9 +3,7 @@ package reseau;
 
 import IHM.Launcher;
 import game.Game;
-import model.Addresse;
-import model.Carte;
-import model.Flotte;
+import model.*;
 
 import java.io.*;
 import java.net.*;
@@ -72,11 +70,11 @@ public class Server {
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
                     broadcast("Le jeu commencera dans 3...");
                     Attente();
-                    broadcast("2...");
+                    broadcast(" 2...");
                     Attente();
-                    broadcast("1...");
+                    broadcast(" 1...");
                     Attente();
-                    broadcast("--- START ---");
+                    broadcast(" --- START ---");
                     //Launcher launcher = new Launcher();
 
                     Socket socket = serverSocket.accept();
@@ -139,20 +137,64 @@ public class Server {
         String time = sdf.format(new Date());
 
         // to check if message is private i.e. client to client message
-        //String[] w = message.split(" ",3);
+        String[] w = message.split(" ",3);
 
-        String messageLf = time + " " + message + "\n";
-        // display message
-        System.out.print(messageLf);
+        boolean isPrivate = false;
+        if(w[1].charAt(0)=='@')
+            isPrivate=true;
 
-        // we loop in reverse order in case we would have to remove a Client
-        // because it has disconnected
-        for (int i = al.size(); --i >= 0; ) {
-            ClientThread ct = al.get(i);
-            // try to write to the Client if it fails remove it from the list
-            if (!ct.writeMsg(messageLf)) {
-                al.remove(i);
-                display("Disconnected Client " + ct.username + " removed from list.");
+
+        // if private message, send message to mentioned username only
+        if(isPrivate==true)
+        {
+            String tocheck=w[1].substring(1, w[1].length());
+
+            message=w[0]+w[2];
+            String messageLf = time + " " + message + "\n";
+            boolean found=false;
+            // we loop in reverse order to find the mentioned username
+            for(int y=al.size(); --y>=0;)
+            {
+                ClientThread ct1=al.get(y);
+                String check=ct1.getUsername();
+                if(check.equals(tocheck))
+                {
+                    // try to write to the Client if it fails remove it from the list
+                    if(!ct1.writeMsg(messageLf)) {
+                        al.remove(y);
+                        display("Disconnected Client " + ct1.username + " removed from list.");
+                    }
+                    // username found and delivered the message
+                    found=true;
+                    break;
+                }
+
+
+
+            }
+            // mentioned user not found, return false
+            if(found!=true)
+            {
+                return false;
+            }
+        }
+        // if message is a broadcast message
+        else
+        {
+            String messageLf = time + " " + message + "\n";
+
+            // display message
+            System.out.print(messageLf);
+
+            // we loop in reverse order in case we would have to remove a Client
+            // because it has disconnected
+            for (int i = al.size(); --i >= 0; ) {
+                ClientThread ct = al.get(i);
+                // try to write to the Client if it fails remove it from the list
+                if (!ct.writeMsg(messageLf)) {
+                    al.remove(i);
+                    display("Disconnected Client " + ct.username + " removed from list.");
+                }
             }
         }
         return true;
@@ -209,6 +251,7 @@ public class Server {
 
     // One instance of this thread will run for each client
     public class ClientThread extends Thread {
+
         // the socket to get messages from client
         private Socket socket;
         private ObjectInputStream sInput;
@@ -222,9 +265,15 @@ public class Server {
         ChatMessage cm;
         // timestamp
         String date;
+
+        
+        public int score1, score2;
         public Game mainGame =  new Game();
         public Flotte flotte = new Flotte();
         public Carte carte = new Carte();
+        public ArrayList<Bateau> compBateau = new ArrayList<Bateau>();
+        public boolean flotteDet = false;
+        public Carte maps = new Carte();
 
         // Constructor
         ClientThread(Socket socket) {
@@ -285,18 +334,20 @@ public class Server {
 
                 //admin
                 if (username.equals(admin)) {
-                    writeMsg("Vous etes l'admin, tapez 'Instruction' pour voir les instructions");
+                    //writeMsg("Vous etes l'admin, tapez 'Instruction' pour voir les instructions");
                     Admin(message);
                 }
 
                 //client1
                 if (username.equals(client1)) {
-                    Client1(message);
+                    Client1Jeu(message);
                 }
 
                 if (username.equals(client2)) {
-                    Client2(message);
+                    Client2Jeu(message);
                 }
+
+
             }
             // if out of the loop then disconnected and remove from client list
             remove(id);
@@ -339,12 +390,14 @@ public class Server {
         }
 
         private void Admin(String message) {
+            writeMsg("Vous etes l'admin, tapez 'Instruction' pour avoir voir les instructions");
             switch (cm.getType()) {
                 case ChatMessage.INSTRUCTION:
                     writeMsg("-- Un simple message pour l'admin --\n" +
-                            "1. Tapez 'WHOISIN' pour voir la listes des clients\n" +
+                            "1. Tapez 'WHO IS IN' pour voir la listes des clients\n" +
                             "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n" +
-                            "3. Tapez 'LOCATION' pour placer les bateaux");
+                            "3. Tapez 'LOCATION' pour placer les bateaux\n" +
+                            "4. Tapez 'AFFICHER CARTE' pour afficher la carte");
                     break;
                 case ChatMessage.MESSAGE:
                     boolean confirmation = broadcast(username + ": " + message);
@@ -365,9 +418,11 @@ public class Server {
                         writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
                     }
                     break;
+
                 case ChatMessage.AFFICHECARTE:
                     writeMsg("\n" + flotte.afficheCarte());
                     break;
+
                 case ChatMessage.LOCATION:
                     writeMsg(flotte.afficheCarte());
                     writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
@@ -375,28 +430,46 @@ public class Server {
                     switch (cm.getType()) {
                         case ChatMessage.MANUEL:
                             writeMsg("Vous devez placez 5 bateaux");
-                            for(int i=5; i>0;) {
+                            for (int i = 5; i > 0; ) {
                                 placeMan(message);
-                                if(Objects.equals(placeMan(message), false)){
-                                    i=0;
+                                if (Objects.equals(placeMan(message), false)) {
+                                    i = 0;
                                     break;
-                                }
-                                else if(Objects.equals(placeMan(message),true)){
+                                } else if (Objects.equals(placeMan(message), true)) {
                                     i--;
-                                    writeMsg("il vous reste encore "+ i +" bateaux a placer");
+                                    writeMsg("il vous reste encore " + i + " bateaux a placer");
                                 }
                             }
-                            writeMsg("Voici le placement final des bateaux \n"+flotte.afficheCarte());
-                            broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
+                            writeMsg("Voici le placement final des bateaux \n" + flotte.afficheCarte());
                             break;
                         case ChatMessage.AUTOMATIQUE:
                             writeMsg(" Placement automatique lancer ");
                             flotte.placeBateauAle();
                             writeMsg(flotte.afficheFlotte());
                             writeMsg(flotte.afficheCarte());
-                            broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
                             break;
                     }
+                    break;
+
+                case ChatMessage.START:
+                    ClientThread ct1 = al.get(1);
+                    ClientThread ct2 = al.get(2);
+                    broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
+                    broadcast("C'est au tour du joueur 1 ("+ct1.username+") de commencez (vous avez dix secondes pour jouer)");
+                    /*getMessageClient();
+                    if(username.equals(ct1)) {
+                        Client1Jeu(message);
+                    }*/
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    broadcast("C'est au tour du joueur 2 ("+ct2.username+") de commencez ( vous avez dix secondes pour jouer)");
+                    /*getMessageClient();
+                    if(username.equals(ct2)) {
+                        Client2Jeu(message);
+                    }*/
                     break;
             }
         }
@@ -438,6 +511,55 @@ public class Server {
                             break;
                     }
                     break;
+            }
+        }
+        private void Client1Jeu(String message){
+            writeMsg("Vous etes le joueur 1, tapez 'Instruction' pour avoir voir les instructions");
+            switch (cm.getType()) {
+                case ChatMessage.INSTRUCTION:
+                    writeMsg("-- Un simple message pour le joueur 1 --\n" +
+                            "1. Tapez 'JOUER' pour voir la listes des clients\n" +
+                            "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n");
+                case ChatMessage.MESSAGE:
+                    boolean confirmation = broadcast(username + ": " + message);
+                    if (confirmation == false) {
+                        String msg = notif + "Desolé. l'utilisateur n'existe pas." + notif;
+                        writeMsg(msg);
+                    }
+                    break;
+                case ChatMessage.LOGOUT:
+                    display(username + " s'est déconnecté avec le message LOGOUT.");
+                    keepGoing = false;
+                    break;
+                case ChatMessage.WHOISIN:
+                    writeMsg("La liste des utilisateurs à " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for (int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                    }
+                case ChatMessage.AFFICHECARTE:
+                    writeMsg("\n"+flotte.afficheFlotte());
+                    writeMsg("\n"+flotte.afficheCarte());
+                    break;
+                case ChatMessage.JOUER:
+                    int aide=0;
+                    writeMsg("c'est a votre tour");
+                    int test=0;
+                    test = lanceAttaque();
+                    if(test==1){
+                        aide=0;
+                        ClientThread ct1 = al.get(1);
+                        writeMsg("Actuellement "+ct1.username);
+                        setScoreClient1(getScoreClient1()+1);
+                        writeMsg("Toucher !!");
+                    }
+                    else {
+                        writeMsg("A l'eau");
+                        writeMsg("Il reste : " + flotte.getNombreBateau()+" bateaux");
+                        ClientThread ct2 = al.get(2);
+                        writeMsg("C'est au tour du joueur 2 : "+ct2.username);
+                    }
             }
         }
 
@@ -487,31 +609,80 @@ public class Server {
                             break;*/
             }
         }
+        private void Client2Jeu(String message){
+            writeMsg("Vous etes le joueur 2, tapez 'Instruction' pour avoir voir les instructions");
+            switch (cm.getType()) {
+                case ChatMessage.INSTRUCTION:
+                    writeMsg("-- Un simple message pour le joueur 2 --\n" +
+                            "1. Tapez 'WHO IS IN' pour voir la listes des clients\n" +
+                            "2. Tapez 'LOGOUT' pour vous déconnectez du serveur\n" +
+                            "3. Tapez 'JOUER' pour vous déconnectez du serveur\n");
+                    break;
+                case ChatMessage.MESSAGE:
+                    boolean confirmation = broadcast(username + ": " + message);
+                    if (confirmation == false) {
+                        String msg = notif + "Desolé. l'utilisateur n'existe pas." + notif;
+                        writeMsg(msg);
+                    }
+                    break;
+                case ChatMessage.LOGOUT:
+                    display(username + " s'est déconnecté avec le message LOGOUT.");
+                    keepGoing = false;
+                    break;
+                case ChatMessage.WHOISIN:
+                    writeMsg("La liste des utilisateurs à " + sdf.format(new Date()) + "\n");
+                    // send list of active clients
+                    for (int i = 0; i < al.size(); ++i) {
+                        ClientThread ct = al.get(i);
+                        writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
+                    }
+                    break;
+                case ChatMessage.JOUER:
+                    int aide=0;
+                    writeMsg("c'est a votre tour");
+                    int test=0;
+                    test = lanceAttaque();
+                    if(test==1){
+                        aide=0;
+                        ClientThread ct2 = al.get(2);
+                        writeMsg("Actuellement "+ct2.username);
+                        setScoreClient2(getScoreClient2()+1);
+                        writeMsg("Toucher !!");
+                    }
+                    else {
+                        writeMsg("A l'eau");
+                        writeMsg("Il reste : " + flotte.getNombreBateau()+" bateaux");
+                        ClientThread ct1 = al.get(1);
+                        writeMsg("C'est au tour du joueur 2 : "+ct1.username);
+                    }
+                    break;
+            }
+        }
 
         private boolean placeMan(String message) {
             boolean bienFait = false;
             writeMsg(" Quel bateau souhaiter placer ? \n "
-                    + " - SousMarin - (1 case)\n "
-                    + " - Torpilleur -(2 cases)\n "
-                    + " - Croiseur - (3 cases)\n "
-                    + " - Cuirasse - (4 cases)\n "
-                    + " - PorteAvions -(5 cases)\n "
-                    + " - Quitter -\n ");
+                    + " - 'Sous Marin' - (1 case)\n "
+                    + " - 'Torpilleur' -(2 cases)\n "
+                    + " - 'Croiseur' - (3 cases)\n "
+                    + " - 'Cuirasse' - (4 cases)\n "
+                    + " - 'Porte Avions' -(5 cases)\n "
+                    + " - 'Quitter' -\n ");
             getMessageClient();
             boolean test = false;
             int a = 0;
             switch (cm.getType()) {
                 case ChatMessage.SOUSMARIN:
                     test = false;
-                    writeMsg(" Placement de SousMarin ? ");
+                    writeMsg(" Placement de Sous Marin ? ");
                     writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), true);
+                            test = flotte.placeSousmarin(recupAdrAdmin(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeSousmarin(recupAdr(), false);
+                            test = flotte.placeSousmarin(recupAdrAdmin(), false);
                             break;
                     }
                     while (!test) {
@@ -520,10 +691,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), true);
+                                test = flotte.placeSousmarin(recupAdrAdmin(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeSousmarin(recupAdr(), false);
+                                test = flotte.placeSousmarin(recupAdrAdmin(), false);
                                 break;
                         }
                     }
@@ -537,10 +708,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeTorpilleur(recupAdr(), true);
+                            test = flotte.placeTorpilleur(recupAdrAdmin(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeTorpilleur(recupAdr(), false);
+                            test = flotte.placeTorpilleur(recupAdrAdmin(), false);
                             break;
                     }
                     while (!test) {
@@ -549,10 +720,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeTorpilleur(recupAdr(), true);
+                                test = flotte.placeTorpilleur(recupAdrAdmin(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeTorpilleur(recupAdr(), false);
+                                test = flotte.placeTorpilleur(recupAdrAdmin(), false);
                                 break;
                         }
                     }
@@ -566,10 +737,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeCroiseur(recupAdr(), true);
+                            test = flotte.placeCroiseur(recupAdrAdmin(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeCroiseur(recupAdr(), false);
+                            test = flotte.placeCroiseur(recupAdrAdmin(), false);
                             break;
                     }
                     while (!test) {
@@ -578,10 +749,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeCroiseur(recupAdr(), true);
+                                test = flotte.placeCroiseur(recupAdrAdmin(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeCroiseur(recupAdr(), false);
+                                test = flotte.placeCroiseur(recupAdrAdmin(), false);
                                 break;
                         }
                     }
@@ -595,10 +766,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placeCuirasse(recupAdr(), true);
+                            test = flotte.placeCuirasse(recupAdrAdmin(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placeCuirasse(recupAdr(), false);
+                            test = flotte.placeCuirasse(recupAdrAdmin(), false);
                             break;
                     }
                     while (!test) {
@@ -607,10 +778,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placeCuirasse(recupAdr(), true);
+                                test = flotte.placeCuirasse(recupAdrAdmin(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placeCuirasse(recupAdr(), false);
+                                test = flotte.placeCuirasse(recupAdrAdmin(), false);
                                 break;
                         }
                     }
@@ -619,15 +790,15 @@ public class Server {
 
                 case ChatMessage.PORTEAVIONS:
                     test = false;
-                    writeMsg(" Placement de PorteAvion ? \n ");
+                    writeMsg(" Placement de Porte Avions ? \n ");
                     writeMsg(" Placement vertical ou horizontal ? \n ");
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = this.flotte.placePorteAvion(recupAdr(), true);
+                            test = flotte.placePorteAvion(recupAdrAdmin(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = this.flotte.placePorteAvion(recupAdr(), false);
+                            test = flotte.placePorteAvion(recupAdrAdmin(), false);
                             break;
                     }
                     while (!test) {
@@ -636,10 +807,10 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = this.flotte.placePorteAvion(recupAdr(), true);
+                                test = flotte.placePorteAvion(recupAdrAdmin(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = this.flotte.placePorteAvion(recupAdr(), false);
+                                test = flotte.placePorteAvion(recupAdrAdmin(), false);
                                 break;
                         }
                     }
@@ -652,8 +823,7 @@ public class Server {
             }
             return false;
         }
-
-        private Addresse recupAdr(){
+        private Addresse recupAdrAdmin(){
             int x=0;
             int y=0;
             writeMsg(" Rentrez l'abscisse ↕ :");
@@ -721,6 +891,377 @@ public class Server {
             }
             return new Addresse(x,y);
         }
+        private Addresse recupAdrClient(){
+            int x=0;
+            int y=0;
+            writeMsg(" Rentrez l'abscisse ↕ :");
+            getMessageClient();
+            switch (cm.getType()){
+                case ChatMessage.UN:
+                    x=1;
+                    broadcast("@admin : "+x);
+                    break;
+                case ChatMessage.DEUX:
+                    x=2;
+                    break;
+                case ChatMessage.TROIS:
+                    x=3;
+                    break;
+                case ChatMessage.QUATRE:
+                    x=4;
+                    break;
+                case ChatMessage.CINQ:
+                    x=5;
+                    break;
+                case ChatMessage.SIX:
+                    x=6;
+                    break;
+                case ChatMessage.SEPT:
+                    x=7;
+                    break;
+                case ChatMessage.HUIT:
+                    x=8;
+                    break;
+                case ChatMessage.NEUF:
+                    x=9;
+                    break;
+            }
+
+            writeMsg(" Rentrez l'ordonnées ↔ :");
+            getMessageClient();
+            switch (cm.getType()){
+                case ChatMessage.UN:
+                    y=1;
+                    break;
+                case ChatMessage.DEUX:
+                    y=2;
+                    break;
+                case ChatMessage.TROIS:
+                    y=3;
+                    break;
+                case ChatMessage.QUATRE:
+                    y=4;
+                    break;
+                case ChatMessage.CINQ:
+                    y=5;
+                    break;
+                case ChatMessage.SIX:
+                    y=6;
+                    break;
+                case ChatMessage.SEPT:
+                    y=7;
+                    break;
+                case ChatMessage.HUIT:
+                    y=8;
+                    break;
+                case ChatMessage.NEUF:
+                    y=9;
+                    break;
+            }
+            return new Addresse(x,y);
+        }
+        private int adrToucher(Addresse t){
+            int i = 0;
+            while (i <compBateau.size()){
+                for (int j = 0; j < compBateau.get(i).getElement().length;j++) {
+                    if (compBateau.get(i).getElement()[j].toucheR(t)) {
+                        writeMsg("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
+                        maps.afficheCarte();
+                        bateauDetruit();
+                        return 1;
+                    }
+                }
+                i++;
+            }
+            bateauDetruit();
+            return 0;
+        }
+        private void bateauDetruit(){
+            for (int i = 0; i <compBateau.size(); i++) {
+                if (compBateau.get(i).estdetruit()){
+                    writeMsg("Le bateau "+compBateau.get(i).getClass()+" a été détruit ");
+                }
+            }
+        }
+        private int lanceAttaque(){
+            return adrToucher(recupAdrClient());
+        }
+        private int getScoreClient1(){
+            return score1;
+        }
+        private  int getScoreClient2(){
+            return score2;
+        }
+        private void setScoreClient1(int score1){
+            score1 = score1;
+        }
+        private void setScoreClient2(int score2) { score2 = score2;}
+        /*
+        public Carte getMaps() {
+            return maps;
+        }
+        public boolean freePosition(int x, int y) {
+            boolean verif = false;
+            if (maps.caseValide(new Addresse(x, y)) && maps.caseVide(new Addresse(x, y))) {
+                verif = true;
+            }
+            return verif;
+        }
+        public boolean freePositioncCroiseurAlignement(Addresse debut, boolean vertical, int taille) {
+            boolean a = true;
+            if (!vertical) {
+                for (int i = 0; i < taille; i++) {
+                    if (!freePosition(debut.getAdrLigne(), debut.getAdrColone() + i)) {
+                        a = false;
+                    }
+                }
+            } else {
+                for (int i = 0; i < taille; i++) {
+                    if (!freePosition(debut.getAdrLigne() + i, debut.getAdrColone())) {
+                        a = false;
+                    }
+                }
+            }
+            return a;
+        }
+        public boolean placeCroiseur(Addresse debut, boolean vertical) {
+            boolean bienFait = false;
+            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
+                    && freePositioncCroiseurAlignement(debut, vertical, CROISEUR_TAILLE)) {
+                if ((vertical != true && CROISEUR_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && CROISEUR_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+                    if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (CROISEUR_TAILLE - debut.getAdrColone()))) {
+                        Croiseur a = new Croiseur(debut.getAdrLigne(), debut.getAdrColone(), CROISEUR_TAILLE, vertical);
+                        for (int i = 0; i < a.getElement().length; i++) {
+                            if (a.getElement()[i] != null) {
+                                maps.PlacerElement(a.getElement()[i]);
+                            }
+                        }
+                        //compBateau.add(a);
+                        AjouterBateau(a);
+                        bienFait = true;
+                    }
+                } else {
+                    System.out.println("Impossible de placer un Croiseur à cette position ");
+                }
+            } else {
+                System.out.println("Impossible de placer un Croiseur à cette position ");
+            }
+            return bienFait;
+        }
+        public boolean placeCuirasse(Addresse debut, boolean vertical) {
+            boolean bienFait = false;
+            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
+                    && freePositioncCroiseurAlignement(debut, vertical, CUIRASSE_TAILLE)) {
+                if ((vertical != true && CUIRASSE_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && CUIRASSE_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+                    if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (CUIRASSE_TAILLE - debut.getAdrColone()))) {
+                        Cuirasse a = new Cuirasse(debut.getAdrLigne(), debut.getAdrColone(), CUIRASSE_TAILLE, vertical);
+                        for (int i = 0; i < a.getElement().length; i++) {
+                            if (a.getElement()[i] != null) {
+                                maps.PlacerElement(a.getElement()[i]);
+                            }
+                        }
+                        //compBateau.add(a);
+                        AjouterBateau(a);
+                        bienFait = true;
+                    }
+                } else {
+                    System.out.println("Impossible de placer un Cuirasse à cette position  ");
+                }
+            } else {
+                System.out.println("Impossible de placer un Cuirasse à cette position ");
+            }
+            return bienFait;
+        }
+        public boolean placePorteAvion(Addresse debut, boolean vertical) {
+            boolean bienFait = false;
+            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
+                    && freePositioncCroiseurAlignement(debut, vertical, PORTEAVIONS_TAILLE)) {
+                if ((vertical != true && PORTEAVIONS_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && PORTEAVIONS_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+                    if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (PORTEAVIONS_TAILLE - debut.getAdrColone()))) {
+                        PorteAvion a = new PorteAvion(debut.getAdrLigne(), debut.getAdrColone(), PORTEAVIONS_TAILLE, vertical);
+                        for (int i = 0; i < a.getElement().length; i++) {
+                            if (a.getElement()[i] != null) {
+                                maps.PlacerElement(a.getElement()[i]);
+                            }
+                        }
+                        //compBateau.add(a);
+                        AjouterBateau(a);
+                        bienFait = true;
+                    }
+                } else {
+                    System.out.println("Impossible de placer un PorteAvion à cette position ");
+                }
+            } else {
+                System.out.println("Impossible de placer un PorteAvion à cette position ");
+            }
+            return bienFait;
+        }
+        public boolean placeTorpilleur(Addresse debut, boolean vertical) {
+            boolean bienFait = false;
+            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
+                    && freePositioncCroiseurAlignement(debut, vertical, TORPILLEUR_TAILLE)) {
+                if ((vertical != true && TORPILLEUR_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && TORPILLEUR_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+
+                    if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (TORPILLEUR_TAILLE - debut.getAdrColone()))) {
+                        Torpilleur a = new Torpilleur(debut.getAdrLigne(), debut.getAdrColone(), TORPILLEUR_TAILLE, vertical);
+                        for (int i = 0; i < a.getElement().length; i++) {
+                            if (a.getElement()[i] != null) {
+                                maps.PlacerElement(a.getElement()[i]);
+                            }
+                        }
+                        //compBateau.add(a);
+                        AjouterBateau(a);
+                        bienFait = true;
+                    }
+                } else {
+                    System.out.println("Impossible de placer un Torpilleur à cette position ");
+                }
+            } else {
+                System.out.println("Impossible de placer un Torpilleur à cette position ");
+            }
+            return bienFait;
+        }
+        public boolean placeSousmarin(Addresse debut, boolean vertical) {
+            boolean bienFait = false;
+            if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (SOUSMARIN_TAILLE - debut.getAdrColone()))) {
+                SousMarin a = new SousMarin(debut.getAdrLigne(), debut.getAdrColone(), SOUSMARIN_TAILLE, vertical);
+                for (int i = 0; i < a.getElement().length; i++) {
+                    if (a.getElement()[i] != null) {
+                        maps.PlacerElement(a.getElement()[i]);
+                    }
+                }
+                //compBateau.add(a);
+                AjouterBateau(a);
+                bienFait = true;
+            } else {
+                System.out.println("Impossible de placer un SousMarin à cette position ");
+            }
+            return bienFait;
+        }
+
+        public boolean AjouterBateau(Bateau ajouter) {
+            boolean a = false;
+            if (compBateau.size() < NOMBRE_BATEAU) {
+                compBateau.add(ajouter);
+                a = true;
+            }
+            return a;
+        }
+        public boolean placeAleSousMarin(){
+            boolean a=false;
+            while(!a){
+                int x=(int) (Math.random() * 9);
+                int y=(int) (Math.random() * 9);
+                int ale= (int) (Math.random() * 2);
+                boolean vertical = false;
+                if(ale>0 && x> 0 && y>0){
+                    if (ale > 0) {
+                        a = placeSousmarin(new Addresse(x, y), true);
+                    } else {
+                        a = placeSousmarin(new Addresse(x, y), false);
+                    }
+                }
+            }
+            return a;
+        }
+        public boolean placeAlePorteAVion(){
+            boolean a=false;
+            while(!a){
+                int x=(int) (Math.random() * 9);
+                int y=(int) (Math.random() * 9);
+                int ale= (int) (Math.random() * 2);
+                boolean vertical = false;
+                if(ale>0 && x>0 && y>0 ){
+                    a = placePorteAvion(new Addresse(x,y),true);
+                }else{
+                    a = placePorteAvion(new Addresse(x,y),false);
+                }
+            }
+            return a;
+        }
+        public boolean placeAleCroiseur(){
+            boolean a=false;
+
+            while(!a){
+                int x=(int) (Math.random() * 9);
+                int y=(int) (Math.random() * 9);
+                int ale= (int) (Math.random() * 2);
+                boolean vertical = false;
+                if(ale>0 && x> 0 && y>0){
+                    a = placeCroiseur(new Addresse(x,y),true);
+                }else{
+                    a = placeCroiseur(new Addresse(x,y),false);
+                }
+            }
+            return a;
+        }
+        public boolean placeAleTorpilleur(){
+            boolean a=false;
+            int i= 0;
+
+            while(!a){
+                int x=(int) (Math.random() * 9);
+                int y=(int) (Math.random() * 9);
+                int ale= (int) (Math.random() * 2);
+                boolean vertical = false;
+                if(ale>0 && x> 0 && y>0){
+                    a = placeTorpilleur(new Addresse(x,y),true);
+                }else{
+                    a = placeTorpilleur(new Addresse(x,y),false);
+                }
+            }
+            return a;
+        }
+        public boolean placeAleCuirasse(){
+
+            boolean a=false;
+            int i= 0;
+
+            while(!a){
+                int x=(int) (Math.random() * 9);
+                int y=(int) (Math.random() * 9);
+                int ale= (int) (Math.random() * 2);
+                boolean vertical = false;
+                if(ale>0 && x> 0 && y>0){
+                    a = placeCuirasse(new Addresse(x,y),true);
+                }else{
+                    a = placeCuirasse(new Addresse(x,y),false);
+                }
+            }
+            return a;
+        }
+        public boolean placeBateauAle(){
+            boolean a=false;
+            a = placeAleCroiseur();
+            a = placeAlePorteAVion();
+            a = placeAleSousMarin();
+            a = placeAleCuirasse();
+            a = placeAleTorpilleur();
+            return  a;
+        }
+        public boolean finDeLaFlotte(){
+
+            return compBateau.isEmpty();
+        }
+        public String afficheFlotte(){
+            String s = new String();
+            for(int i=0;i< compBateau.size();i++) {
+                s+= compBateau.get(i).toString();
+                //sSystem.out.println(compBateau.get(i).toString());
+            }
+            return s;
+        }
+        public  int getNombreBateau(){
+            return  compBateau.size();
+        }
+        public String afficheCarte(){
+
+            return maps.afficheCarte();
+        }*/
 
     }
 }
