@@ -11,15 +11,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Server {
-    // a unique ID for each connection
+    // ID pour la connection
     private int uniqueId;
-    // an ArrayList to keep the list of the Client
+    // ArrayList des clients thread
     private ArrayList<ClientThread> al;
-    // to display time
+    // afficher temps
     private SimpleDateFormat sdf;
-    // the port number to listen for connection
+    // portnumber du server
     private int port;
-    // to check if server is running
+    // verifier si le serveur en marche
     private boolean keepGoing;
     // notification
     private String notif = " *** ";
@@ -28,14 +28,13 @@ public class Server {
     public Carte carte;
     private Launcher launcher;
 
-    //constructor that receive the port to listen to for connection as parameter
-
+    //constructor
     public Server(int port) {
         // the port
         this.port = port;
-        // to display hh:mm:ss
+        // afficher hh:mm:ss
         sdf = new SimpleDateFormat("HH:mm:ss");
-        // an ArrayList to keep the list of the Client
+        // ArrayList des clients
         al = new ArrayList<ClientThread>();
         mainGame = new Game();
         flotte = new Flotte();
@@ -46,27 +45,27 @@ public class Server {
 
     private void start() {
         keepGoing = true;
-        //create socket server and wait for connection requests
+        //creer un serveurSocket et attend les connexion requests
         try {
-            // the socket used by the server
+            // socket utiliser par le server
             ServerSocket serverSocket = new ServerSocket(port);
 
-            // infinite loop to wait for connections ( till server is active )
+            // boucle infini pour attente de connexions
             while (keepGoing) {
                 if (al.size() < 3) {
-                    display("Server waiting for Clients on port " + port + ".");
-                    // accept connection if requested from client
+                    display("Le Serveur attend les clients au port " + port + ".");
+                    //accepte connexion des clients
                     Socket socket = serverSocket.accept();
-                    // break if server stoped
+                    // break si le serveur est stopper
                     if (!keepGoing)
                         break;
-                    // if client is connected, create its thread
+                    //si le client est connecter, cela créer un thread
                     ClientThread t = new ClientThread(socket);
-                    //add this client to arraylist
+                    //ajoute le client à arraylist
                     al.add(t);
                     t.start();
                 }
-                if (al.size() == 3) {
+                if (al.size() == 3) { // il y a 3 client
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
                     broadcast("Le jeu commencera dans 3...");
                     Attente();
@@ -75,24 +74,23 @@ public class Server {
                     broadcast(" 1...");
                     Attente();
                     broadcast(" --- START ---");
-                    //Launcher launcher = new Launcher();
 
                     Socket socket = serverSocket.accept();
                     if (!keepGoing)
                         break;
-                    // if client is connected, create its thread
+                    //si le client est connecter, cela créer un thread
                     ClientThread t = new ClientThread(socket);
                     t.start();
                 }
 
             }
-            // try to stop the server
+            // essaie de stopper le serveur
             try {
                 serverSocket.close();
                 for (int i = 0; i < al.size(); ++i) {
                     ClientThread tc = al.get(i);
                     try {
-                        // close all data streams and socket
+                        //ferme les data streams et socket
                         tc.sInput.close();
                         tc.sOutput.close();
                         tc.socket.close();
@@ -116,7 +114,7 @@ public class Server {
         }
     }
 
-    // to stop the server
+    // stop le server
     private void stop() {
         keepGoing = false;
         try {
@@ -125,45 +123,40 @@ public class Server {
         }
     }
 
-    // Display an event to the console
+    //equivalent d'un System.out.println
     private void display(String msg) {
         String time = sdf.format(new Date()) + " " + msg;
         System.out.println(time);
     }
 
-    // to broadcast a message to all Clients
+    //permet d'envoyer un message a tous les clients
     private synchronized boolean broadcast(String message) {
-        // add timestamp to the message
+
         String time = sdf.format(new Date());
-
-        // to check if message is private i.e. client to client message
         String[] w = message.split(" ",3);
+        String messageLf = time + " " + message + "\n";
 
-            String messageLf = time + " " + message + "\n";
+        // affiche le message
+        System.out.print(messageLf);
 
-            // display message
-            System.out.print(messageLf);
-
-            // we loop in reverse order in case we would have to remove a Client
-            // because it has disconnected
-            for (int i = al.size(); --i >= 0; ) {
-                ClientThread ct = al.get(i);
-                // try to write to the Client if it fails remove it from the list
-                if (!ct.writeMsg(messageLf)) {
-                    al.remove(i);
-                    display("Disconnected Client " + ct.username + " removed from list.");
-                }
+        for (int i = al.size(); --i >= 0; ) {
+            ClientThread ct = al.get(i);
+            // try to write to the Client if it fails remove it from the list
+            if (!ct.writeMsg(messageLf)) {
+                al.remove(i);
+                display("Deconnecte le client " + ct.username + " et l'efface de la liste.");
             }
+        }
         return true;
 
 
     }
 
-    // if client sent LOGOUT message to exit
+    // SI le client envoie LOGOUT message pour sortir
     private synchronized void remove(int id) {
 
         String disconnectedClient = "";
-        // scan the array list until we found the Id
+        // scan l'arraylist jusquuntil we found the Id
         for (int i = 0; i < al.size(); ++i) {
             ClientThread ct = al.get(i);
             // if found remove it
@@ -420,10 +413,12 @@ public class Server {
 
                 case ChatMessage.START:
                     broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
-                    while(compBateau.size()==5) {
+                    boolean count=true;
+                    while(count){//compBateau.size()==5) {
                         ClientThread ct1 = al.get(1);
                         ClientThread ct2 = al.get(2);
                         broadcast("C'est au tour du joueur 1 (" + ct1.username + ") de commencez (vous avez dix secondes pour jouer)");
+                        ct1.writeMsg(ct1.username + "a" + ct1.getScoreClient() + "points");
                         ct1.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
                         try {
                             Thread.sleep(15000);
@@ -431,11 +426,18 @@ public class Server {
                             e.printStackTrace();
                         }
                         broadcast("C'est au tour du joueur 2 (" + ct2.username + ") de commencez ( vous avez dix secondes pour jouer)");
+                        ct2.writeMsg(ct1.username + "a" + ct2.getScoreClient() + "points");
                         ct2.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
                         try {
                             Thread.sleep(15000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        }
+                        getMessageClient();
+                        switch (cm.getType()){
+                            case ChatMessage.QUITTER:
+                                count = false;
+                                break;
                         }
                     }
                     break;
