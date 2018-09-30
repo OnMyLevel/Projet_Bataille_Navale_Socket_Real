@@ -231,7 +231,7 @@ public class Carte {
         // TODO Auto-generated method stub
 
         Carte a;
-        Element b  = new Element();
+        Element b  = new Element(" X ");
         Element v  = new Element();
         Addresse n= new Addresse(5,3);
         Addresse h= new Addresse(7,9);

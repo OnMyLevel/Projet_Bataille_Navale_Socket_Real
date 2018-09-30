@@ -13,7 +13,7 @@ import testSocket.TimeServer;
 
 import  java.awt.event.*;
 
-public class FenAdmin extends JFrame implements  ActionListener{
+public class AdminGUI extends JFrame implements  ActionListener{
 
     /**
      * Gestion du jeux
@@ -38,12 +38,12 @@ public class FenAdmin extends JFrame implements  ActionListener{
     private JRadioButton vertical;
     private  JTextArea getCoord;
     private JButton   valider;
-    private JOptionPane bateauInfo;
+    private JOptionPane Info;
     private JButton   lancerPartie;
     private JTextArea infoGenerale;
 
 
-    public FenAdmin(String titre, int x, int y, int w, int h, Game moteurJeu) {
+    public AdminGUI(String titre, int x, int y, int w, int h, Game moteurJeu) {
 
         super(titre);
 
@@ -53,16 +53,17 @@ public class FenAdmin extends JFrame implements  ActionListener{
         this.setBounds(x, y, w, h);
         this.setResizable(false);
         this.setVisible(true);
-        //this.getPanelCenter().getAccessibleContext().getAccessibleChild(1).
+
     }
 
     public void initGame(){
         this.server = new TimeServer();
         this.server.open();
         this.server.setRealGame( new  Game());
+        this.server.getRealGame().setAncienNombreJoueur(0);
     }
 
-    public FenAdmin() {
+    public AdminGUI() {
 
         super("BATAILLE NAVALE");
         this.initGame();
@@ -295,15 +296,13 @@ public class FenAdmin extends JFrame implements  ActionListener{
             placementAl.setEnabled(false);
             placementMan.setEnabled(false);
 
-
             if (server.getRealGame().getFlotte().getNombreBateau() > 4) {
                 //Boîte du message d'information
-                bateauInfo = new JOptionPane();
-                bateauInfo.showMessageDialog(null,
+                Info = new JOptionPane();
+                Info.showMessageDialog(null,
                         "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
                 refreshJframe();
             }
-
             refreshJframe();
         }
     }
@@ -365,17 +364,16 @@ public class FenAdmin extends JFrame implements  ActionListener{
                     }
 
                 }
-                nombreDejoueursChange();
+               gameRerefresh();
             }
 
             if (server.getRealGame().getFlotte().getNombreBateau() > 5) {
                 valider.setEnabled(false);
                 //Boîte du message d'information
-                bateauInfo = new JOptionPane();
-                bateauInfo.showMessageDialog(null,
-                        "Vous avez assez de bateau pour lancer la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
-                nombreDejoueursChange();
-                refreshJframe();
+                Info = new JOptionPane();
+                Info.showMessageDialog(null,
+                        "Le nombre Maximum de bateau est atteint ", "Information", JOptionPane.INFORMATION_MESSAGE);
+                gameRerefresh();
             }
         }
     }
@@ -387,14 +385,13 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Placement Ale");
-
             placementMan.setEnabled(false);
             placementAl.setEnabled(false);
             getCoord.setVisible(true);
             vertical.setVisible(true);
             valider.setVisible(true);
             comboBox.setVisible(true);
-            nombreDejoueursChange();
+            gameRerefresh();
             refreshJframe();
         }
     }
@@ -418,15 +415,14 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Lancer");
-            lancerPartie();
+            gameRerefresh();
             infoGenerale.setText(infoGenerale.getText()+"\n ********Lancement de la partie********");
-            nombreDejoueursChange();
         }
     }
 
     private void lancerPartie() {
         System.out.println("Lancement de la partie");
-        nombreDejoueursChange();
+        gameRerefresh();
     }
 
     private class LabelAdapter extends MouseAdapter {
@@ -434,6 +430,7 @@ public class FenAdmin extends JFrame implements  ActionListener{
         public void mouseClicked(MouseEvent e) {
             JLabel a = (JLabel ) e.getComponent();
             System.out.println(a.getText());
+            gameRerefresh();
             nombreDejoueursChange();
         }
         @Override
@@ -457,8 +454,8 @@ public class FenAdmin extends JFrame implements  ActionListener{
             placementAl.setEnabled(true);
             placementMan.setEnabled(true);
             comboBox.setVisible(false);
+            gameRerefresh();
             refreshJframe();
-            nombreDejoueursChange();
         }
     }
 
@@ -469,8 +466,8 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Refresh");
+            gameRerefresh();
             refreshJframe();
-            nombreDejoueursChange();
         }
     }
 
@@ -481,16 +478,18 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
 
     public  void refreshJframe(){
-
        this.refreshPanelCenter();
        this.refreshPanelNorth();
        this.refreshPanelSouth();
        this.refreshPanelWest();
        this.refreshPanelEst();
-       nombreDejoueursChange();
-       LancerPartie();
+       this.gameRerefresh();;
        this.repaint();
+    }
 
+    public void gameRerefresh(){
+        nombreDejoueursChange();
+        LancerPartie();
     }
 
     private void refreshPanelNorth() {
@@ -500,11 +499,10 @@ public class FenAdmin extends JFrame implements  ActionListener{
     }
 
     private void refreshPanelSouth() {
-
     }
 
     public void LancerPartie(){
-        if(this.server.getRealGame().getFlotte().getNombreBateau() >4 && this.server.getRealGame().getJoueurs().size() >2){
+        if(this.server.getRealGame().getFlotte().getNombreBateau() >4 && this.server.getRealGame().getJoueurs().size() >1){
             lancerPartie.setEnabled(true);
         }
     }
@@ -518,10 +516,11 @@ public class FenAdmin extends JFrame implements  ActionListener{
 
     public  void  nombreDejoueursChange(){
         if(this.server.getRealGame().getJoueurs().size() > this.server.getRealGame().getAncienNombreJoueur()){
-            bateauInfo = new JOptionPane();
-            bateauInfo.showMessageDialog(null,
-                    this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()+1)+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
+            Info = new JOptionPane();
+            Info.showMessageDialog(null,
+                    this.server.getRealGame().getJoueurs().get(this.server.getRealGame().getAncienNombreJoueur()).getLogin()+"A rejoint la partie", "Information", JOptionPane.INFORMATION_MESSAGE);
          this.server.getRealGame().setProchainJoueur(this.server.getRealGame().getJoueurs().size());
+            this.server.getRealGame().setAncienNombreJoueur(this.server.getRealGame().getJoueurs().size());
         }
     }
 
@@ -539,17 +538,6 @@ public class FenAdmin extends JFrame implements  ActionListener{
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
                 }
-
-                /*
-                else if(i==0){
-                    this.tab[i][j].setText(j+"");
-                    this.tab[i][j].setBackground(Color.white);
-                }
-                else if(j==0){
-                    this.tab[i][j].setText(i+"");
-                    this.tab[i][j].setBackground(Color.white);
-                }*/
-
                 else{
                     if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
                         //this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
@@ -562,6 +550,12 @@ public class FenAdmin extends JFrame implements  ActionListener{
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.magenta);
                         this.tab[i][j].setText(i+","+j);
+
+                    }  else if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" ! ") {
+                        // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
+                        this.tab[i][j].setText(" ");
+                        this.tab[i][j].setBackground(Color.black);
+                        //this.tab[i][j].setText(i+","+j);
                     }
                     else {
                         this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
@@ -575,9 +569,10 @@ public class FenAdmin extends JFrame implements  ActionListener{
             }
         }
     }
+
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        FenAdmin a = new FenAdmin();
+        AdminGUI a = new AdminGUI();
     }
 }
 

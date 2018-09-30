@@ -107,14 +107,6 @@ public class Launcher {
         nv = new Launcher();
 
         new SwingOpenImage("C:\\Users\\rahma\\Documents\\ESIEAA\\4A\\bataille.jpg");
-		/*String path = "C:\\Users\\vince\\Desktop\\bataille";
-        BufferedImage image = ImageIO.read(new File(path));
-        Image contentPane = new Image(image);
-        JFrame f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setContentPane(contentPane);
-        f.setSize(400, 400);
-        f.setLocation(100, 100);
-        f.setVisible(true);*/
+
     }
 }

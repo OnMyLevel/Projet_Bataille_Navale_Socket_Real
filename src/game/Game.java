@@ -287,10 +287,6 @@ public class Game {
     }
 
     public String infoGame(){
-
-        System.out.println(this.getJoueurs().toString());
-        System.out.println("Il reste : " + this.getFlotte().getNombreBateau() + " Bateaux");
-        System.out.println(this.getFlotte().afficheFlotte().toString());
         this.flotte.afficheCarte();
         String a = (" Actuellement\n "
                 + "Il reste : "+this.getFlotte().getNombreBateau() + " Bateaux \n");
