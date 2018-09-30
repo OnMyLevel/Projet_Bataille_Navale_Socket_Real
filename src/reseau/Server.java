@@ -63,7 +63,9 @@ public class Server {
                     ClientThread t = new ClientThread(socket);
                     //ajoute le client à arraylist
                     al.add(t);
-                    t.start();
+                    if(al.get(0).username.equals("admin")) {
+                        t.start();
+                    }
                 }
                 if (al.size() == 3) { // il y a 3 client
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
