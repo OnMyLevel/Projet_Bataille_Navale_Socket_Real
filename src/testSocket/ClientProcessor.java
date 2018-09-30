@@ -104,15 +104,14 @@ public class ClientProcessor implements Runnable{
                             closeConnexion = true;
                             break;
                     }
-
-
-                    //On envoie la réponse au client
-                    writer.write(toSend);
-                    //Il FAUT IMPERATIVEMENT UTILISER flush()
-                    //Sinon les données ne seront pas transmises au client
-                    //et il attendra indéfiniment
-                    writer.flush();
                 }
+
+                //On envoie la réponse au client
+                writer.write(toSend);
+                //Il FAUT IMPERATIVEMENT UTILISER flush()
+                //Sinon les données ne seront pas transmises au client
+                //et il attendra indéfiniment
+                writer.flush();
                 if(closeConnexion){
                     System.err.println("COMMANDE CLOSE DETECTEE ! ");
                     writer = null;

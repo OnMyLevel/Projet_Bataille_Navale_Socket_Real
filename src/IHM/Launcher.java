@@ -1,4 +1,7 @@
 package IHM;
+import interfaces.AdminGUI;
+import interfaces.JoueurGUI;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -12,8 +15,8 @@ import java.awt.*;
 
 public class Launcher implements ImageObserver {
 
-    private JFrame lancement2;
-    private JFrame lancement3;
+    private AdminGUI lancement2;
+    private JoueurGUI lancement3;
     private static Launcher nv;
     private JButton quitterFenetre;
     private JButton jouer;
@@ -40,10 +43,11 @@ public class Launcher implements ImageObserver {
     public JFrame getLancement3() {
         return lancement3;
     }
-    public void setLancement2(JFrame lancement2) {
+    public void setLancement2(
+            AdminGUI lancement2) {
         this.lancement2 = lancement2;
     }
-    public void setLancement3(JFrame lancement3) {
+    public void setLancement3(JoueurGUI lancement3) {
         this.lancement3 = lancement3;
     }
     public static Launcher getNv() {
@@ -77,15 +81,6 @@ public class Launcher implements ImageObserver {
         this.pw = pw;
     }
 
-    //private Image panel_Titre= new Image("img/bataille.jpg");
-
-	/*public JPanel getPanelNorth() throws IOException {
-		Image a = ImageIO.read(new File("C://Users/vince/eclipse-workspace/IHM_BatailleNavale/img/bataille.jpg"));
-		this.panelNorth= new ImagePanel();
-		this.panelNorth.set
-		this.panelNorth.setVisible(true);
-		return panelNorth;
-	}*/
 
     public void setPanelNorth(ImagePanel panelNorth) {
         this.panelNorth = panelNorth;
@@ -156,17 +151,12 @@ public class Launcher implements ImageObserver {
                 test = checkId(username, password);
                 System.out.println(test);
                 if(test==true) {
-                    lancement2 = new JFrame("ADMIN");
-                    lancement2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    lancement2.setSize(400, 400);
-                    lancement2.setVisible(true);
+
+                    lancement2 = new AdminGUI();
                     //System.exit(1);
                 }
                 else {
-                    lancement3 = new JFrame("JOUEUR");
-                    lancement3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    lancement3.setSize(400, 400);
-                    lancement3.setVisible(true);
+                    lancement3 = new JoueurGUI();
                     //System.exit(1);
                 }
 
@@ -179,36 +169,6 @@ public class Launcher implements ImageObserver {
         //AFFICHER LA FENETRE
         fenetreLancement.setVisible(true);
     }
-
-	/*public void ActionPerformed(ActionEvent e) {
-
-		if (e.getSource() == jouer) {
-
-			this.username = id.getText();
-	        char[] mdpTab = pw.getPassword();
-	        this.password = new String(mdpTab);
-            boolean test= false;
-
-	        test =checkId(this.username, this.password);
-	        if(test) {
-	        	this.lancement2 = new JFrame("ADMIN");
-	        	lancement2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	        	lancement2.setSize(400, 400);
-	        	lancement2.setVisible(true);
-				//System.exit(1);
-	        }else {
-	        	this.lancement3 = new JFrame("JOUEUR");
-	        	lancement3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	        	lancement3.setSize(400, 400);
-	        	lancement3.setVisible(true);
-				//System.exit(1);
-	        }
-
-		}
-		else if (e.getSource() == quitterFenetre) {
-			System.exit(1);
-		}
-	}*/
 
     private boolean checkId(String username, String password) {
         System.out.println(username);
