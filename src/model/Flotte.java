@@ -154,7 +154,6 @@ public class Flotte {
         return bienFait;
     }
 
-
     public boolean placeSousmarin(Addresse debut, boolean vertical) {
         boolean bienFait = false;
         if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (SOUSMARIN_TAILLE - debut.getAdrColone()))) {

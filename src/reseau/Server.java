@@ -139,48 +139,6 @@ public class Server {
         // to check if message is private i.e. client to client message
         String[] w = message.split(" ",3);
 
-        boolean isPrivate = false;
-        if(w[1].charAt(0)=='@')
-            isPrivate=true;
-
-
-        // if private message, send message to mentioned username only
-        if(isPrivate==true)
-        {
-            String tocheck=w[1].substring(1, w[1].length());
-
-            message=w[0]+w[2];
-            String messageLf = time + " " + message + "\n";
-            boolean found=false;
-            // we loop in reverse order to find the mentioned username
-            for(int y=al.size(); --y>=0;)
-            {
-                ClientThread ct1=al.get(y);
-                String check=ct1.getUsername();
-                if(check.equals(tocheck))
-                {
-                    // try to write to the Client if it fails remove it from the list
-                    if(!ct1.writeMsg(messageLf)) {
-                        al.remove(y);
-                        display("Disconnected Client " + ct1.username + " removed from list.");
-                    }
-                    // username found and delivered the message
-                    found=true;
-                    break;
-                }
-
-
-
-            }
-            // mentioned user not found, return false
-            if(found!=true)
-            {
-                return false;
-            }
-        }
-        // if message is a broadcast message
-        else
-        {
             String messageLf = time + " " + message + "\n";
 
             // display message
@@ -196,7 +154,6 @@ public class Server {
                     display("Disconnected Client " + ct.username + " removed from list.");
                 }
             }
-        }
         return true;
 
 
@@ -266,8 +223,16 @@ public class Server {
         // timestamp
         String date;
 
-        
-        public int score1, score2;
+        public static final int NOMBRE_BATEAU = 5;
+
+        public static final int SOUSMARIN_TAILLE = 1;
+        public static final int TORPILLEUR_TAILLE = 2;
+        public static final int CROISEUR_TAILLE = 3;
+        public static final int CUIRASSE_TAILLE = 4;
+        public static final int PORTEAVIONS_TAILLE = 5;
+
+
+        public int score,score1, score2;
         public Game mainGame =  new Game();
         public Flotte flotte = new Flotte();
         public Carte carte = new Carte();
@@ -420,56 +385,59 @@ public class Server {
                     break;
 
                 case ChatMessage.AFFICHECARTE:
-                    writeMsg("\n" + flotte.afficheCarte());
+                    writeMsg("\n" + al.get(0).afficheCarte());
+                    writeMsg(String.valueOf(al.get(0).compBateau));
                     break;
 
                 case ChatMessage.LOCATION:
-                    writeMsg(flotte.afficheCarte());
+                    writeMsg(al.get(0).afficheCarte());
                     writeMsg("Voulez vous placer les bateaux manuellement(manuel) ou automatiquement(automatique) ?");
                     getMessageClient();
                     switch (cm.getType()) {
                         case ChatMessage.MANUEL:
                             writeMsg("Vous devez placez 5 bateaux");
                             for (int i = 5; i > 0; ) {
-                                placeMan(message);
-                                if (Objects.equals(placeMan(message), false)) {
+                                al.get(0).placeMan(message);
+                                if (Objects.equals(al.get(0).placeMan(message), false)) {
                                     i = 0;
                                     break;
-                                } else if (Objects.equals(placeMan(message), true)) {
+                                } else if (Objects.equals(al.get(0).placeMan(message), true)) {
                                     i--;
                                     writeMsg("il vous reste encore " + i + " bateaux a placer");
                                 }
                             }
-                            writeMsg("Voici le placement final des bateaux \n" + flotte.afficheCarte());
+                            writeMsg("Voici le placement final des bateaux \n" + al.get(0).afficheCarte());
                             break;
                         case ChatMessage.AUTOMATIQUE:
                             writeMsg(" Placement automatique lancer ");
-                            flotte.placeBateauAle();
-                            writeMsg(flotte.afficheFlotte());
-                            writeMsg(flotte.afficheCarte());
+                            al.get(0).placeBateauAle();
+                            writeMsg(al.get(0).afficheFlotte());
+                            writeMsg(al.get(0).afficheCarte());
+                            writeMsg("Il y a :"+al.get(0).compBateau.size()+" bateaux");
                             break;
                     }
                     break;
 
                 case ChatMessage.START:
-                    ClientThread ct1 = al.get(1);
-                    ClientThread ct2 = al.get(2);
                     broadcast("Les bateaux sont placés, vous pouvez commencez a jouer !! Que le meilleur gagne");
-                    broadcast("C'est au tour du joueur 1 ("+ct1.username+") de commencez (vous avez dix secondes pour jouer)");
-                    /*getMessageClient();
-                    if(username.equals(ct1)) {
-                        Client1Jeu(message);
-                    }*/
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    while(compBateau.size()==5) {
+                        ClientThread ct1 = al.get(1);
+                        ClientThread ct2 = al.get(2);
+                        broadcast("C'est au tour du joueur 1 (" + ct1.username + ") de commencez (vous avez dix secondes pour jouer)");
+                        ct1.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
+                        try {
+                            Thread.sleep(15000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        broadcast("C'est au tour du joueur 2 (" + ct2.username + ") de commencez ( vous avez dix secondes pour jouer)");
+                        ct2.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
+                        try {
+                            Thread.sleep(15000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    broadcast("C'est au tour du joueur 2 ("+ct2.username+") de commencez ( vous avez dix secondes pour jouer)");
-                    /*getMessageClient();
-                    if(username.equals(ct2)) {
-                        Client2Jeu(message);
-                    }*/
                     break;
             }
         }
@@ -539,24 +507,23 @@ public class Server {
                         writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
                     }
                 case ChatMessage.AFFICHECARTE:
-                    writeMsg("\n"+flotte.afficheFlotte());
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheFlotte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     break;
                 case ChatMessage.JOUER:
                     int aide=0;
-                    writeMsg("c'est a votre tour");
                     int test=0;
-                    test = lanceAttaque();
+                    test = al.get(0).lanceAttaque1();
                     if(test==1){
                         aide=0;
                         ClientThread ct1 = al.get(1);
                         writeMsg("Actuellement "+ct1.username);
-                        setScoreClient1(getScoreClient1()+1);
+                        al.get(1).setScoreClient(al.get(1).getScoreClient()+1);
                         writeMsg("Toucher !!");
                     }
                     else {
                         writeMsg("A l'eau");
-                        writeMsg("Il reste : " + flotte.getNombreBateau()+" bateaux");
+                        writeMsg("Il reste : " + al.get(0).getNombreBateau()+" bateaux");
                         ClientThread ct2 = al.get(2);
                         writeMsg("C'est au tour du joueur 2 : "+ct2.username);
                     }
@@ -637,21 +604,24 @@ public class Server {
                         writeMsg((i + 1) + ") " + ct.username + " depuis " + ct.date);
                     }
                     break;
+                case ChatMessage.AFFICHECARTE:
+                    writeMsg("\n"+al.get(0).afficheFlotte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
+                    break;
                 case ChatMessage.JOUER:
                     int aide=0;
-                    writeMsg("c'est a votre tour");
                     int test=0;
-                    test = lanceAttaque();
+                    test = al.get(0).lanceAttaque2();
                     if(test==1){
                         aide=0;
                         ClientThread ct2 = al.get(2);
                         writeMsg("Actuellement "+ct2.username);
-                        setScoreClient2(getScoreClient2()+1);
+                        al.get(2).setScoreClient(al.get(2).getScoreClient()+1);
                         writeMsg("Toucher !!");
                     }
                     else {
                         writeMsg("A l'eau");
-                        writeMsg("Il reste : " + flotte.getNombreBateau()+" bateaux");
+                        writeMsg("Il reste : " + al.get(0).getNombreBateau()+" bateaux");
                         ClientThread ct1 = al.get(1);
                         writeMsg("C'est au tour du joueur 2 : "+ct1.username);
                     }
@@ -679,10 +649,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = flotte.placeSousmarin(recupAdrAdmin(), true);
+                            test = al.get(0).placeSousmarin(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = flotte.placeSousmarin(recupAdrAdmin(), false);
+                            test = al.get(0).placeSousmarin(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -691,14 +661,14 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = flotte.placeSousmarin(recupAdrAdmin(), true);
+                                test = al.get(0).placeSousmarin(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = flotte.placeSousmarin(recupAdrAdmin(), false);
+                                test = al.get(0).placeSousmarin(recupAdr(), false);
                                 break;
                         }
                     }
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     return true;
 
                 case ChatMessage.TORPILLEUR:
@@ -708,10 +678,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = flotte.placeTorpilleur(recupAdrAdmin(), true);
+                            test = al.get(0).placeTorpilleur(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = flotte.placeTorpilleur(recupAdrAdmin(), false);
+                            test = al.get(0).placeTorpilleur(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -720,14 +690,14 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = flotte.placeTorpilleur(recupAdrAdmin(), true);
+                                test = al.get(0).placeTorpilleur(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = flotte.placeTorpilleur(recupAdrAdmin(), false);
+                                test = al.get(0).placeTorpilleur(recupAdr(), false);
                                 break;
                         }
                     }
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     return true;
 
                 case ChatMessage.CROISEUR:
@@ -737,10 +707,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = flotte.placeCroiseur(recupAdrAdmin(), true);
+                            test = al.get(0).placeCroiseur(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = flotte.placeCroiseur(recupAdrAdmin(), false);
+                            test = al.get(0).placeCroiseur(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -749,14 +719,14 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = flotte.placeCroiseur(recupAdrAdmin(), true);
+                                test = al.get(0).placeCroiseur(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = flotte.placeCroiseur(recupAdrAdmin(), false);
+                                test = al.get(0).placeCroiseur(recupAdr(), false);
                                 break;
                         }
                     }
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     return true;
 
                 case ChatMessage.CUIRASE:
@@ -766,10 +736,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = flotte.placeCuirasse(recupAdrAdmin(), true);
+                            test = al.get(0).placeCuirasse(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = flotte.placeCuirasse(recupAdrAdmin(), false);
+                            test = al.get(0).placeCuirasse(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -778,14 +748,14 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = flotte.placeCuirasse(recupAdrAdmin(), true);
+                                test = al.get(0).placeCuirasse(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = flotte.placeCuirasse(recupAdrAdmin(), false);
+                                test = al.get(0).placeCuirasse(recupAdr(), false);
                                 break;
                         }
                     }
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     return true;
 
                 case ChatMessage.PORTEAVIONS:
@@ -795,10 +765,10 @@ public class Server {
                     getMessageClient();
                     switch (cm.getType()){
                         case ChatMessage.VERTICAL:
-                            test = flotte.placePorteAvion(recupAdrAdmin(), true);
+                            test = al.get(0).placePorteAvion(recupAdr(), true);
                             break;
                         case ChatMessage.HORIZONTAL:
-                            test = flotte.placePorteAvion(recupAdrAdmin(), false);
+                            test = al.get(0).placePorteAvion(recupAdr(), false);
                             break;
                     }
                     while (!test) {
@@ -807,14 +777,14 @@ public class Server {
                         getMessageClient();
                         switch (cm.getType()){
                             case ChatMessage.VERTICAL:
-                                test = flotte.placePorteAvion(recupAdrAdmin(), true);
+                                test = al.get(0).placePorteAvion(recupAdr(), true);
                                 break;
                             case ChatMessage.HORIZONTAL:
-                                test = flotte.placePorteAvion(recupAdrAdmin(), false);
+                                test = al.get(0).placePorteAvion(recupAdr(), false);
                                 break;
                         }
                     }
-                    writeMsg("\n"+flotte.afficheCarte());
+                    writeMsg("\n"+al.get(0).afficheCarte());
                     return true;
 
                 case ChatMessage.QUITTER:
@@ -823,7 +793,7 @@ public class Server {
             }
             return false;
         }
-        private Addresse recupAdrAdmin(){
+        private Addresse recupAdr(){
             int x=0;
             int y=0;
             writeMsg(" Rentrez l'abscisse ↕ :");
@@ -894,36 +864,45 @@ public class Server {
         private Addresse recupAdrClient(){
             int x=0;
             int y=0;
+            ClientThread ctadmin = al.get(0);
             writeMsg(" Rentrez l'abscisse ↕ :");
             getMessageClient();
             switch (cm.getType()){
                 case ChatMessage.UN:
                     x=1;
-                    broadcast("@admin : "+x);
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.DEUX:
                     x=2;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.TROIS:
                     x=3;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.QUATRE:
                     x=4;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.CINQ:
                     x=5;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.SIX:
                     x=6;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.SEPT:
                     x=7;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.HUIT:
                     x=8;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.NEUF:
                     x=9;
+                    ctadmin.writeMsg("");
                     break;
             }
 
@@ -932,77 +911,86 @@ public class Server {
             switch (cm.getType()){
                 case ChatMessage.UN:
                     y=1;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.DEUX:
                     y=2;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.TROIS:
                     y=3;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.QUATRE:
                     y=4;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.CINQ:
                     y=5;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.SIX:
                     y=6;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.SEPT:
                     y=7;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.HUIT:
                     y=8;
+                    ctadmin.writeMsg("");
                     break;
                 case ChatMessage.NEUF:
                     y=9;
+                    ctadmin.writeMsg("");
                     break;
             }
             return new Addresse(x,y);
         }
         private int adrToucher(Addresse t){
             int i = 0;
-            while (i <compBateau.size()){
-                for (int j = 0; j < compBateau.get(i).getElement().length;j++) {
-                    if (compBateau.get(i).getElement()[j].toucheR(t)) {
+            while (i <al.get(0).compBateau.size()){
+                for (int j = 0; j < al.get(0).compBateau.get(i).getElement().length;j++) {
+                    if (al.get(0).compBateau.get(i).getElement()[j].toucheR(t)) {
                         writeMsg("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
-                        maps.afficheCarte();
-                        bateauDetruit();
+                        al.get(0).maps.afficheCarte();
+                        al.get(0).bateauDetruit();
                         return 1;
                     }
                 }
                 i++;
             }
-            bateauDetruit();
+            al.get(0).bateauDetruit();
             return 0;
         }
         private void bateauDetruit(){
-            for (int i = 0; i <compBateau.size(); i++) {
-                if (compBateau.get(i).estdetruit()){
-                    writeMsg("Le bateau "+compBateau.get(i).getClass()+" a été détruit ");
+            for (int i = 0; i <al.get(0).compBateau.size(); i++) {
+                if (al.get(0).compBateau.get(i).estdetruit()){
+                    writeMsg("Le bateau "+al.get(0).compBateau.get(i).getClass()+" a été détruit ");
                 }
             }
         }
-        private int lanceAttaque(){
-            return adrToucher(recupAdrClient());
+        private int lanceAttaque1(){
+            return al.get(0).adrToucher(al.get(1).recupAdr());
         }
-        private int getScoreClient1(){
-            return score1;
+        private int lanceAttaque2(){
+            return al.get(0).adrToucher(al.get(2).recupAdr());
         }
-        private  int getScoreClient2(){
-            return score2;
+        private int getScoreClient(){
+            return score;
         }
-        private void setScoreClient1(int score1){
-            score1 = score1;
+        private void setScoreClient(int score){
+            score = score;
         }
-        private void setScoreClient2(int score2) { score2 = score2;}
-        /*
+
+
         public Carte getMaps() {
-            return maps;
+            return al.get(0).maps;
         }
         public boolean freePosition(int x, int y) {
             boolean verif = false;
-            if (maps.caseValide(new Addresse(x, y)) && maps.caseVide(new Addresse(x, y))) {
+            if (al.get(0).maps.caseValide(new Addresse(x, y)) && al.get(0).maps.caseVide(new Addresse(x, y))) {
                 verif = true;
             }
             return verif;
@@ -1011,13 +999,13 @@ public class Server {
             boolean a = true;
             if (!vertical) {
                 for (int i = 0; i < taille; i++) {
-                    if (!freePosition(debut.getAdrLigne(), debut.getAdrColone() + i)) {
+                    if (!al.get(0).freePosition(debut.getAdrLigne(), debut.getAdrColone() + i)) {
                         a = false;
                     }
                 }
             } else {
                 for (int i = 0; i < taille; i++) {
-                    if (!freePosition(debut.getAdrLigne() + i, debut.getAdrColone())) {
+                    if (!al.get(0).freePosition(debut.getAdrLigne() + i, debut.getAdrColone())) {
                         a = false;
                     }
                 }
@@ -1026,19 +1014,18 @@ public class Server {
         }
         public boolean placeCroiseur(Addresse debut, boolean vertical) {
             boolean bienFait = false;
-            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
-                    && freePositioncCroiseurAlignement(debut, vertical, CROISEUR_TAILLE)) {
-                if ((vertical != true && CROISEUR_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
-                        (vertical == true && CROISEUR_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+            if (!debut.equal(al.get(0).maps.EXAVERTICAL) && !debut.equal(al.get(0).maps.EXBHORYSENTAL)
+                    && al.get(0).freePositioncCroiseurAlignement(debut, vertical, CROISEUR_TAILLE)) {
+                if ((vertical != true && CROISEUR_TAILLE <= al.get(0).maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && CROISEUR_TAILLE <= al.get(0).maps.TAILLELIGNE - debut.getAdrLigne())) {
                     if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (CROISEUR_TAILLE - debut.getAdrColone()))) {
                         Croiseur a = new Croiseur(debut.getAdrLigne(), debut.getAdrColone(), CROISEUR_TAILLE, vertical);
                         for (int i = 0; i < a.getElement().length; i++) {
                             if (a.getElement()[i] != null) {
-                                maps.PlacerElement(a.getElement()[i]);
+                                al.get(0).maps.PlacerElement(a.getElement()[i]);
                             }
                         }
-                        //compBateau.add(a);
-                        AjouterBateau(a);
+                        al.get(0).compBateau.add(a);
                         bienFait = true;
                     }
                 } else {
@@ -1051,19 +1038,18 @@ public class Server {
         }
         public boolean placeCuirasse(Addresse debut, boolean vertical) {
             boolean bienFait = false;
-            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
-                    && freePositioncCroiseurAlignement(debut, vertical, CUIRASSE_TAILLE)) {
-                if ((vertical != true && CUIRASSE_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
-                        (vertical == true && CUIRASSE_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+            if (!debut.equal(al.get(0).maps.EXAVERTICAL) && !debut.equal(al.get(0).maps.EXBHORYSENTAL)
+                    && al.get(0).freePositioncCroiseurAlignement(debut, vertical, CUIRASSE_TAILLE)) {
+                if ((vertical != true && CUIRASSE_TAILLE <= al.get(0).maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && CUIRASSE_TAILLE <= al.get(0).maps.TAILLELIGNE - debut.getAdrLigne())) {
                     if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (CUIRASSE_TAILLE - debut.getAdrColone()))) {
                         Cuirasse a = new Cuirasse(debut.getAdrLigne(), debut.getAdrColone(), CUIRASSE_TAILLE, vertical);
                         for (int i = 0; i < a.getElement().length; i++) {
                             if (a.getElement()[i] != null) {
-                                maps.PlacerElement(a.getElement()[i]);
+                                al.get(0).maps.PlacerElement(a.getElement()[i]);
                             }
                         }
-                        //compBateau.add(a);
-                        AjouterBateau(a);
+                        al.get(0).compBateau.add(a);
                         bienFait = true;
                     }
                 } else {
@@ -1076,19 +1062,18 @@ public class Server {
         }
         public boolean placePorteAvion(Addresse debut, boolean vertical) {
             boolean bienFait = false;
-            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
-                    && freePositioncCroiseurAlignement(debut, vertical, PORTEAVIONS_TAILLE)) {
-                if ((vertical != true && PORTEAVIONS_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
-                        (vertical == true && PORTEAVIONS_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+            if (!debut.equal(al.get(0).maps.EXAVERTICAL) && !debut.equal(al.get(0).maps.EXBHORYSENTAL)
+                    && al.get(0).freePositioncCroiseurAlignement(debut, vertical, PORTEAVIONS_TAILLE)) {
+                if ((vertical != true && PORTEAVIONS_TAILLE <= al.get(0).maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && PORTEAVIONS_TAILLE <= al.get(0).maps.TAILLELIGNE - debut.getAdrLigne())) {
                     if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (PORTEAVIONS_TAILLE - debut.getAdrColone()))) {
                         PorteAvion a = new PorteAvion(debut.getAdrLigne(), debut.getAdrColone(), PORTEAVIONS_TAILLE, vertical);
                         for (int i = 0; i < a.getElement().length; i++) {
                             if (a.getElement()[i] != null) {
-                                maps.PlacerElement(a.getElement()[i]);
+                                al.get(0).maps.PlacerElement(a.getElement()[i]);
                             }
                         }
-                        //compBateau.add(a);
-                        AjouterBateau(a);
+                        al.get(0).compBateau.add(a);
                         bienFait = true;
                     }
                 } else {
@@ -1101,20 +1086,19 @@ public class Server {
         }
         public boolean placeTorpilleur(Addresse debut, boolean vertical) {
             boolean bienFait = false;
-            if (!debut.equal(maps.EXAVERTICAL) && !debut.equal(maps.EXBHORYSENTAL)
-                    && freePositioncCroiseurAlignement(debut, vertical, TORPILLEUR_TAILLE)) {
-                if ((vertical != true && TORPILLEUR_TAILLE <= maps.TAILLECOLONNE - debut.getAdrColone()) ||
-                        (vertical == true && TORPILLEUR_TAILLE <= maps.TAILLELIGNE - debut.getAdrLigne())) {
+            if (!debut.equal(al.get(0).maps.EXAVERTICAL) && !debut.equal(al.get(0).maps.EXBHORYSENTAL)
+                    && al.get(0).freePositioncCroiseurAlignement(debut, vertical, TORPILLEUR_TAILLE)) {
+                if ((vertical != true && TORPILLEUR_TAILLE <= al.get(0).maps.TAILLECOLONNE - debut.getAdrColone()) ||
+                        (vertical == true && TORPILLEUR_TAILLE <= al.get(0).maps.TAILLELIGNE - debut.getAdrLigne())) {
 
                     if (freePosition(debut.getAdrLigne(), debut.getAdrColone() + (TORPILLEUR_TAILLE - debut.getAdrColone()))) {
                         Torpilleur a = new Torpilleur(debut.getAdrLigne(), debut.getAdrColone(), TORPILLEUR_TAILLE, vertical);
                         for (int i = 0; i < a.getElement().length; i++) {
                             if (a.getElement()[i] != null) {
-                                maps.PlacerElement(a.getElement()[i]);
+                                al.get(0).maps.PlacerElement(a.getElement()[i]);
                             }
                         }
-                        //compBateau.add(a);
-                        AjouterBateau(a);
+                        al.get(0).compBateau.add(a);
                         bienFait = true;
                     }
                 } else {
@@ -1131,25 +1115,15 @@ public class Server {
                 SousMarin a = new SousMarin(debut.getAdrLigne(), debut.getAdrColone(), SOUSMARIN_TAILLE, vertical);
                 for (int i = 0; i < a.getElement().length; i++) {
                     if (a.getElement()[i] != null) {
-                        maps.PlacerElement(a.getElement()[i]);
+                        al.get(0).maps.PlacerElement(a.getElement()[i]);
                     }
                 }
-                //compBateau.add(a);
-                AjouterBateau(a);
+                al.get(0).compBateau.add(a);
                 bienFait = true;
             } else {
                 System.out.println("Impossible de placer un SousMarin à cette position ");
             }
             return bienFait;
-        }
-
-        public boolean AjouterBateau(Bateau ajouter) {
-            boolean a = false;
-            if (compBateau.size() < NOMBRE_BATEAU) {
-                compBateau.add(ajouter);
-                a = true;
-            }
-            return a;
         }
         public boolean placeAleSousMarin(){
             boolean a=false;
@@ -1160,9 +1134,9 @@ public class Server {
                 boolean vertical = false;
                 if(ale>0 && x> 0 && y>0){
                     if (ale > 0) {
-                        a = placeSousmarin(new Addresse(x, y), true);
+                        a = al.get(0).placeSousmarin(new Addresse(x, y), true);
                     } else {
-                        a = placeSousmarin(new Addresse(x, y), false);
+                        a = al.get(0).placeSousmarin(new Addresse(x, y), false);
                     }
                 }
             }
@@ -1176,9 +1150,9 @@ public class Server {
                 int ale= (int) (Math.random() * 2);
                 boolean vertical = false;
                 if(ale>0 && x>0 && y>0 ){
-                    a = placePorteAvion(new Addresse(x,y),true);
+                    a = al.get(0).placePorteAvion(new Addresse(x,y),true);
                 }else{
-                    a = placePorteAvion(new Addresse(x,y),false);
+                    a = al.get(0).placePorteAvion(new Addresse(x,y),false);
                 }
             }
             return a;
@@ -1192,9 +1166,9 @@ public class Server {
                 int ale= (int) (Math.random() * 2);
                 boolean vertical = false;
                 if(ale>0 && x> 0 && y>0){
-                    a = placeCroiseur(new Addresse(x,y),true);
+                    a = al.get(0).placeCroiseur(new Addresse(x,y),true);
                 }else{
-                    a = placeCroiseur(new Addresse(x,y),false);
+                    a = al.get(0).placeCroiseur(new Addresse(x,y),false);
                 }
             }
             return a;
@@ -1209,9 +1183,9 @@ public class Server {
                 int ale= (int) (Math.random() * 2);
                 boolean vertical = false;
                 if(ale>0 && x> 0 && y>0){
-                    a = placeTorpilleur(new Addresse(x,y),true);
+                    a = al.get(0).placeTorpilleur(new Addresse(x,y),true);
                 }else{
-                    a = placeTorpilleur(new Addresse(x,y),false);
+                    a = al.get(0).placeTorpilleur(new Addresse(x,y),false);
                 }
             }
             return a;
@@ -1227,41 +1201,40 @@ public class Server {
                 int ale= (int) (Math.random() * 2);
                 boolean vertical = false;
                 if(ale>0 && x> 0 && y>0){
-                    a = placeCuirasse(new Addresse(x,y),true);
+                    a = al.get(0).placeCuirasse(new Addresse(x,y),true);
                 }else{
-                    a = placeCuirasse(new Addresse(x,y),false);
+                    a = al.get(0).placeCuirasse(new Addresse(x,y),false);
                 }
             }
             return a;
         }
         public boolean placeBateauAle(){
             boolean a=false;
-            a = placeAleCroiseur();
-            a = placeAlePorteAVion();
-            a = placeAleSousMarin();
-            a = placeAleCuirasse();
-            a = placeAleTorpilleur();
+            a = al.get(0).placeAleCroiseur();
+            a = al.get(0).placeAlePorteAVion();
+            a = al.get(0).placeAleSousMarin();
+            a = al.get(0).placeAleCuirasse();
+            a = al.get(0).placeAleTorpilleur();
             return  a;
         }
         public boolean finDeLaFlotte(){
 
-            return compBateau.isEmpty();
+            return al.get(0).compBateau.isEmpty();
         }
         public String afficheFlotte(){
             String s = new String();
-            for(int i=0;i< compBateau.size();i++) {
-                s+= compBateau.get(i).toString();
-                //sSystem.out.println(compBateau.get(i).toString());
+            for(int i=0;i< al.get(0).compBateau.size();i++) {
+                s+= al.get(0).compBateau.get(i).toString();
+                //sSystem.out.println(al.get(0).compBateau.get(i).toString());
             }
             return s;
         }
         public  int getNombreBateau(){
-            return  compBateau.size();
+            return  al.get(0).compBateau.size();
         }
         public String afficheCarte(){
 
-            return maps.afficheCarte();
-        }*/
-
+            return al.get(0).maps.afficheCarte();
+        }
     }
 }
