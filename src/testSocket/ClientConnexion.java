@@ -83,7 +83,8 @@ public class ClientConnexion implements Runnable{
     public void run(){
 
         //nous n'allons faire que 10 demandes par thread...
-        for(int i =0; i < 10; i++){
+       // for(int i =0; i < 10; i++){
+        while(this.getCoorAttaque()!="Q" ){
             try {
                 Thread.currentThread().sleep(1000);
             } catch (InterruptedException e) {
@@ -94,7 +95,7 @@ public class ClientConnexion implements Runnable{
                 writer = new PrintWriter(connexion.getOutputStream(), true);
                 reader = new BufferedInputStream(connexion.getInputStream());
                 //On envoie la commande au serveur
-               if(this.getCoorAttaque()!=null && this.getCoorAttaque()!="") {
+              if(this.getCoorAttaque()!=null){
                     String commande = getCommand(this.getCoorAttaque());
                     writer.write(commande);
                     //TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS AU SERVEUR
@@ -103,7 +104,7 @@ public class ClientConnexion implements Runnable{
                     //On attend la réponse
                     String response = read();
                     this.setRetourAttaque(response);
-                    String[] tab = read().split(",");
+                    String[] tab = response.split(",");
                     System.out.println(" ICI");
                     System.out.println(tab[0]);
                     if(tab[0].compareTo("1")==0) {
@@ -113,7 +114,7 @@ public class ClientConnexion implements Runnable{
                         this.setToucher(Integer.valueOf(tab[0]));
                         System.out.println("\t * : " + " Réponse reçue " + "\n " + response);
                     }
-                }
+               }
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -132,26 +133,28 @@ public class ClientConnexion implements Runnable{
 
     //Méthode qui permet d'envoyer une attaque
 
-    private String getCommand(String coord) {
+   private String getCommand(String coord) {
         System.out.println(coord);
         return coord;
     }
 
- /*  private String getCommand(String coord){
+ /* private String getCommand(String coord){
         System.out.println(" Tapez les coordonées de la case \n ");
         Scanner sc = new Scanner(System.in);
         String x = sc.next();
+        this.setCoorAttaque(x);
         return  x;
    }*/
 
-
     //Méthode pour lire les réponses du serveur
     private String read() throws IOException{
+        System.out.println("read()");
         String response = "";
         int stream;
         byte[] b = new byte[4096];
         stream = reader.read(b);
         response = new String(b, 0, stream);
+        System.out.println(response);
         return response;
     }
 

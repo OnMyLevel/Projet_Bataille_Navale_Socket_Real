@@ -186,7 +186,6 @@ public class Launcher implements ImageObserver {
 
     public static void main(String[] args) throws IOException {
 
-
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -199,7 +198,6 @@ public class Launcher implements ImageObserver {
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-
         nv = new Launcher();
     }
 

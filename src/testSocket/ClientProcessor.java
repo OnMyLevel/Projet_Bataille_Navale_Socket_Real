@@ -51,26 +51,26 @@ public class ClientProcessor implements Runnable{
                 //On affiche quelques infos, pour le débuggage
                 String debug = "";
                 debug = "Thread : " + Thread.currentThread().getName() + ". ";
-                debug += "Demande de l'adresse : " + remote.getAddress().getHostAddress() +".";
-                debug += " Sur le port : " + remote.getPort() + ".\n";
+                debug += "Attaque sur l'adresse : " + remote.getAddress().getHostAddress() +".";
                 debug += "\t -> Commande reçue : " + response + "\n";
                 System.err.println("\n" + debug);
 
                 //On traite la demande du client en fonction de la commande envoyée
 
                 String toSend = "";
-                if (response !=null && response !=" ") {
-                    String[] a = response.split(",");
+                if(response !=null && response !=" ") {
+                    String a = response;
+                    String[] tab = a.split(",");
                     System.out.println("LANCE ATTTAQUE");
-                    System.out.println(a[0].toString());
-                    System.out.println(a[0]);
-                    System.out.println(a[1]);
-                    int x = Integer.valueOf(a[0]);
-                    int y = Integer.valueOf(a[1]);
+                    System.out.println(tab[0]);
+                    System.out.println(tab[1]);
+                    int x = Integer.valueOf(tab[0]);
+                    int y = Integer.valueOf(tab[1]);
                     System.out.println("LANCE ATTTAQUE");
                     int test = realGame.lanceAttaque(new Addresse(x, y));
                     switch (test) {
                         case 0:
+                            System.out.println("A l'eau ");
                             toSend = "2, A l'eau !";
                             int score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
                             toSend += " votre score ( " + joueur.getLogin() + ") est de : " + score + "\n";
@@ -83,6 +83,7 @@ public class ClientProcessor implements Runnable{
                             toSend += "Prochain joueur, " + realGame.getProchainJoueur();
                             break;
                         case 1:
+                            System.out.println("toucher");
                             toSend = "1, Toucher ! \n ";
                             realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore() + 1);
                             score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
@@ -96,16 +97,15 @@ public class ClientProcessor implements Runnable{
                                 } else {
                                     realGame.setProchainJoueur(joueur.getIdGame() + 1);
                                 }
-
                             }
                             toSend += "Prochain joueur, " + realGame.getProchainJoueur();
                             break;
                         default:
-                            closeConnexion = true;
+                            toSend += "Jouer SVP , " + realGame.getProchainJoueur();
                             break;
                     }
+                    response = null;
                 }
-
                 //On envoie la réponse au client
                 writer.write(toSend);
                 //Il FAUT IMPERATIVEMENT UTILISER flush()
@@ -132,7 +132,7 @@ public class ClientProcessor implements Runnable{
     private String read() throws IOException{
         String response = "";
         int stream;
-        byte[] b = new byte[4096];
+        byte[] b = new byte[9096];
         stream = reader.read(b);
         response = new String(b, 0, stream);
         return response;

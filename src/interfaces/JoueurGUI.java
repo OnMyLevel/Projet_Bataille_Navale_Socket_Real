@@ -240,31 +240,38 @@ public class JoueurGUI extends JFrame implements  ActionListener{
     }
 
     public class ActionValiderPla extends AbstractAction {
-        public ActionValiderPla(String texte){
+        public ActionValiderPla(String texte) {
             super(texte);
         }
 
         public void actionPerformed(ActionEvent e) {
 
-            if(getCoord.getText() != null && getCoord.getText() !=" " ) {
-
+            if (getCoord.getText() != null && getCoord.getText() != " ") {
+                System.out.println("ATTAQUE COTE CLIENT");
+                System.out.println(client.getCoorAttaque());
                 client.setCoorAttaque(getCoord.getText());
                 String[] tab = getCoord.getText().split(",");
                 int x = Integer.valueOf(tab[0]);
                 int y = Integer.valueOf(tab[1]);
                 exX = x;
-                exY= y;
+                exY = y;
                 gameRerefresh();
             }
-
-            if (client.getJoueur().getIdGame() == 1) {
+            /*if (client.getJoueur().getIdGame() == 1) {
                 Info = new JOptionPane();
                 Info.showMessageDialog(null,
                         " Avoue de jouer", "Information", JOptionPane.INFORMATION_MESSAGE);
                 gameRerefresh();
             }
             getCoord.setText("0,0");
+        }*/
+
+            else {
+                System.out.println("ICI");
+            }
+
         }
+
     }
 
     public class ActionQuitter extends AbstractAction {
@@ -315,11 +322,11 @@ public class JoueurGUI extends JFrame implements  ActionListener{
 
 
     public  void refreshJframe(){
+        this.gameRerefresh();
         this.refreshPanelCenter();
         this.refreshPanelNorth();
         this.refreshPanelWest();
         this.refreshPanelEst();
-        this.gameRerefresh();;
         this.repaint();
     }
 
