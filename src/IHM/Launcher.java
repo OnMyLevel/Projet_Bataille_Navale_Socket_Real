@@ -43,8 +43,7 @@ public class Launcher implements ImageObserver {
     public JFrame getLancement3() {
         return lancement3;
     }
-    public void setLancement2(
-            AdminGUI lancement2) {
+    public void setLancement2(AdminGUI lancement2) {
         this.lancement2 = lancement2;
     }
     public void setLancement3(JoueurGUI lancement3) {
@@ -117,8 +116,9 @@ public class Launcher implements ImageObserver {
         //fenetreLancement.getContentPane().setBackground(new Color(253,245,230));
 
         // this.getFenetreLancement().add(this.getPanelNorth());
-        this.setBackgroundImage(this.fenetreLancement, new File("/Users/christanismerilbanzouzi/Desktop/GENIE-LOGICIEL/Projet_Bataille_Navale_Socket/img/bataille.jpg"));
-
+        this.setBackgroundImage(this.fenetreLancement, new File("C://Users/rahma/Documents/ESIEAA/4A/Projet_Bataille_Navale_Socket_Real/img/bataille.jpg"));
+        //C://Users/rahma/Documents/ESIEAA/4A/Projet_Bataille_Navale_Socket_Real/img
+        ///Users/christanismerilbanzouzi/Desktop/GENIE-LOGICIEL/Projet_Bataille_Navale_Socket/img/bataille.jpg
 
 
         ///s�paration :
@@ -146,18 +146,29 @@ public class Launcher implements ImageObserver {
                 username = id.getText();
                 char[] mdpTab = pw.getPassword();
                 password = new String(mdpTab);
-                boolean test= false;
+                boolean test;
 
                 test = checkId(username, password);
                 System.out.println(test);
                 if(test==true) {
-
-                    lancement2 = new AdminGUI();
-                    //System.exit(1);
+                    try {
+                        lancement2 = new AdminGUI();
+                        lancement2.setVisible(true);
+                    }
+                    catch (Exception xe){
+                        System.out.println(xe);
+                    }
                 }
-                else {
-                    lancement3 = new JoueurGUI();
-                    //System.exit(1);
+                else if(test==false){
+
+                    try {
+                        System.out.println("Je suis dans JOUEUR");
+                        lancement3 = new JoueurGUI();
+                        lancement3.setVisible(true);
+                    }
+                    catch (Exception xe){
+                        System.out.println(xe);
+                    }
                 }
 
             }
@@ -173,13 +184,12 @@ public class Launcher implements ImageObserver {
     private boolean checkId(String username, String password) {
         System.out.println(username);
         System.out.println(password);
+        String s;
         if	(username.equals("admin") && password.equals("admin")) {
-
+            s="admin";
             return true;//lancer fenetre admin
-        }
-        else
-        {
-            return false; //lance fenetre joueur
+        }else{
+            return false;
         }
 
     }
