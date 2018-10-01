@@ -89,7 +89,6 @@ public class ClientProcessor implements Runnable{
                             toSend = "1, Toucher ! \n ";
                             realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore() + 1);
                             score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
-                            toSend += " votre score (" + joueur.getLogin() + ") est de : " + score + "\n";
                             realGame.setMessageAttaque(toSend);
                             if (realGame.getProchainJoueur() == realGame.getJoueurs().size() - 1) {
                                 realGame.setProchainJoueur(0);

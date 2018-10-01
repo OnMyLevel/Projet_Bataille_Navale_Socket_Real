@@ -65,7 +65,7 @@ public class AdminGUI extends JFrame implements  ActionListener{
 
     public AdminGUI() {
 
-        super("BATAILLE-NAVALE-INTERFACES-JOUEUR");
+        super("BATAILLE-NAVALE-INTERFACES-ADMIN");
         this.initGame();
         this.setLayout(new BorderLayout());
         this.initialise();
