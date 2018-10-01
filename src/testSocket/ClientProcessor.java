@@ -3,6 +3,7 @@ package testSocket;
 import game.Game;
 import game.Joueur;
 import model.Addresse;
+import model.Element;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class ClientProcessor implements Runnable{
                             break;
                         case 1:
                             System.out.println("toucher");
+                            realGame.getFlotte().getMaps().setElementT(new Element(" * "),new Addresse(x,y));
                             toSend = "1, Toucher ! \n ";
                             realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore() + 1);
                             score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
@@ -137,5 +139,4 @@ public class ClientProcessor implements Runnable{
         response = new String(b, 0, stream);
         return response;
     }
-
 }

@@ -185,24 +185,27 @@ public class Flotte {
         while (i <this.compBateau.size()){
             for (int j = 0; j < this.compBateau.get(i).getElement().length;j++) {
                 if (this.compBateau.get(i).getElement()[j].toucheR(t)) {
-                    System.out.println("Vous avez couler un bateau à l'adresse  " + t.toString() + "");
-                    //this.maps.afficheCarte();
-                    this.bateauDetruit();
+                    System.out.println("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
                     return 1;
                 }
             }
             i++;
         }
-        this.bateauDetruit();
-        return 0;
+         if(this.bateauDetruit()==2){
+             return 2;
+        }else {
+             return 0;
+         }
     }
 
-    public void bateauDetruit() {
+    public int  bateauDetruit() {
         for (int i = 0; i < this.compBateau.size(); i++) {
             if (this.compBateau.get(i).estdetruit()){
                 System.out.println("Le bateaut "+this.compBateau.get(i).getClass()+" a été détruit ");
+                return 2;
             }
         }
+        return 1;
     }
 
     public boolean placeAleSousMarin(){

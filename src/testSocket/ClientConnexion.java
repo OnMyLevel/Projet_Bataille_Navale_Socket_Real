@@ -81,9 +81,6 @@ public class ClientConnexion implements Runnable{
     }
 
     public void run(){
-
-        //nous n'allons faire que 10 demandes par thread...
-       // for(int i =0; i < 10; i++){
         while(this.getCoorAttaque()!="Q" ){
             try {
                 Thread.currentThread().sleep(1000);
@@ -124,6 +121,7 @@ public class ClientConnexion implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+           // this.setCoorAttaque(null);
         }
 
         writer.write("CLOSE");
@@ -132,7 +130,6 @@ public class ClientConnexion implements Runnable{
     }
 
     //Méthode qui permet d'envoyer une attaque
-
    private String getCommand(String coord) {
         System.out.println(coord);
         return coord;
