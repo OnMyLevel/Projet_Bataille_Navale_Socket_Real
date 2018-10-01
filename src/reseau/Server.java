@@ -64,6 +64,12 @@ public class Server {
                     if(al.get(0).username.equals("admin")) {
                         t.start();
                     }
+                    else if(al.get(1).username.equals("admin")) {
+                        t.start();
+                    }
+                    else if(al.get(2).username.equals("admin")) {
+                        t.start();
+                    }
                 }
                 if (al.size()>2) { // il y a 3 client
                     broadcast("Nous sommes au complet, le jeu va pouvoir commencer");
@@ -233,7 +239,7 @@ public class Server {
                 sInput = new ObjectInputStream(socket.getInputStream());
                 // read the username
                 username = (String) sInput.readObject();
-                broadcast(notif + username + " has joined the chat room." + notif);
+                broadcast(notif + username + " a rejoin Bataille Navale 2000" + notif);
             } catch (IOException e) {
                 display("Exception creating new Input/output Streams: " + e);
                 return;
@@ -404,7 +410,7 @@ public class Server {
                         ClientThread ct1 = al.get(1);
                         ClientThread ct2 = al.get(2);
                         broadcast("C'est au tour du joueur 1 (" + ct1.username + ") de commencez (vous avez 20 secondes pour jouer)");
-                        ct1.writeMsg(ct1.username + "a" + ct1.getScoreClient() + "points");
+                        ct1.writeMsg(ct1.username + " a " + ct1.getScoreClient() + " points");
                         ct1.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
                         try {
                             Thread.sleep(20000);
@@ -412,19 +418,14 @@ public class Server {
                             e.printStackTrace();
                         }
                         broadcast("C'est au tour du joueur 2 (" + ct2.username + ") de commencez ( vous avez 20 secondes pour jouer)");
-                        ct2.writeMsg(ct1.username + "a" + ct2.getScoreClient() + "points");
+                        ct2.writeMsg(ct2.username + " a " + ct2.getScoreClient() + " points");
                         ct2.writeMsg("C'est a votre tour\n Tapez 'JOUER' pour jouer");
                         try {
                             Thread.sleep(20000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        /*getMessageClient();
-                        switch (cm.getType()){
-                            case ChatMessage.QUITTER:
-                                count = false;
-                                break;
-                        }*/
+                        writeMsg("\n"+al.get(0).afficheCarte());
                     }
                     break;
             }
@@ -501,12 +502,14 @@ public class Server {
                 case ChatMessage.JOUER:
                     int aide=0;
                     int test=0;
+                    writeMsg("Actuellement "+al.get(1).username);
                     test = al.get(0).lanceAttaque1();
                     if(test==1){
                         aide=0;
                         ClientThread ct1 = al.get(1);
-                        writeMsg("Actuellement "+ct1.username);
-                        al.get(1).setScoreClient(al.get(1).getScoreClient()+1);
+                        int gsc1 = ct1.getScoreClient();
+                        gsc1 = gsc1 + 1;
+                        ct1.setScoreClient(gsc1);
                         writeMsg("Toucher !!");
                     }
                     else {
@@ -599,12 +602,14 @@ public class Server {
                 case ChatMessage.JOUER:
                     int aide=0;
                     int test=0;
+                    writeMsg("Actuellement "+al.get(2).username);
                     test = al.get(0).lanceAttaque2();
                     if(test==1){
                         aide=0;
                         ClientThread ct2 = al.get(2);
-                        writeMsg("Actuellement "+ct2.username);
-                        al.get(2).setScoreClient(al.get(2).getScoreClient()+1);
+                        int gsc2 = ct2.getScoreClient();
+                        gsc2 = gsc2 + 1;
+                        ct2.setScoreClient(gsc2);
                         writeMsg("Toucher !!");
                     }
                     else {
@@ -849,93 +854,6 @@ public class Server {
             }
             return new Addresse(x,y);
         }
-        private Addresse recupAdrClient(){
-            int x=0;
-            int y=0;
-            ClientThread ctadmin = al.get(0);
-            writeMsg(" Rentrez l'abscisse ↕ :");
-            getMessageClient();
-            switch (cm.getType()){
-                case ChatMessage.UN:
-                    x=1;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.DEUX:
-                    x=2;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.TROIS:
-                    x=3;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.QUATRE:
-                    x=4;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.CINQ:
-                    x=5;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.SIX:
-                    x=6;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.SEPT:
-                    x=7;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.HUIT:
-                    x=8;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.NEUF:
-                    x=9;
-                    ctadmin.writeMsg("");
-                    break;
-            }
-
-            writeMsg(" Rentrez l'ordonnées ↔ :");
-            getMessageClient();
-            switch (cm.getType()){
-                case ChatMessage.UN:
-                    y=1;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.DEUX:
-                    y=2;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.TROIS:
-                    y=3;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.QUATRE:
-                    y=4;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.CINQ:
-                    y=5;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.SIX:
-                    y=6;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.SEPT:
-                    y=7;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.HUIT:
-                    y=8;
-                    ctadmin.writeMsg("");
-                    break;
-                case ChatMessage.NEUF:
-                    y=9;
-                    ctadmin.writeMsg("");
-                    break;
-            }
-            return new Addresse(x,y);
-        }
         private int adrToucher(Addresse t){
             int i = 0;
             while (i <al.get(0).compBateau.size()){
@@ -956,6 +874,7 @@ public class Server {
             for (int i = 0; i <al.get(0).compBateau.size(); i++) {
                 if (al.get(0).compBateau.get(i).estdetruit()){
                     writeMsg("Le bateau "+al.get(0).compBateau.get(i).getClass()+" a été détruit ");
+                    al.get(0).compBateau.remove(1);
                 }
             }
         }
