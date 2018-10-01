@@ -117,7 +117,7 @@ public class Launcher implements ImageObserver {
         //fenetreLancement.getContentPane().setBackground(new Color(253,245,230));
 
         // this.getFenetreLancement().add(this.getPanelNorth());
-        this.setBackgroundImage(this.fenetreLancement, new File("C://Users/rahma/Documents/ESIEAA/4A/Projet_Bataille_Navale_Socket_Real/img/bataille.jpg"));
+        this.setBackgroundImage(this.fenetreLancement, new File("/Users/christanismerilbanzouzi/Desktop/GENIE-LOGICIEL/Projet_Bataille_Navale_Socket/img/bataille.jpg"));
 
 
 

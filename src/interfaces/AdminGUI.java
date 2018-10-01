@@ -65,7 +65,7 @@ public class AdminGUI extends JFrame implements  ActionListener{
 
     public AdminGUI() {
 
-        super("BATAILLE NAVALE");
+        super("BATAILLE-NAVALE-INTERFACES-JOUEUR");
         this.initGame();
         this.setLayout(new BorderLayout());
         this.initialise();
@@ -113,7 +113,6 @@ public class AdminGUI extends JFrame implements  ActionListener{
                 if(j==0 && i==0){
                     this.tab[i][j].setBackground(Color.white);
                 }
-                /*
                 else if(i==0){
                     this.tab[i][j].setText(j+"");
                     this.tab[i][j].setBackground(Color.white);
@@ -121,7 +120,7 @@ public class AdminGUI extends JFrame implements  ActionListener{
                 else if(j==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
-                }*/
+                }
                 else{
                     if(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString()==" # ") {
                         this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
@@ -535,6 +534,13 @@ public class AdminGUI extends JFrame implements  ActionListener{
                 this.tab[i][j].setHorizontalAlignment(SwingConstants.CENTER); // pour
                 // tab[colonne][ligne].addMouseListener((MouseListener) ); // ajouter l'��couteur aux
                 if(j==0 && i==0){
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(i==0){
+                    this.tab[i][j].setText(j+"");
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(j==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
                 }

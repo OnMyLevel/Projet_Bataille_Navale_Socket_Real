@@ -67,7 +67,7 @@ public class JoueurGUI extends JFrame implements  ActionListener{
 
     public JoueurGUI() {
 
-        super("BATAILLE NAVALE");
+        super("BATAILLE-NAVALE-INTERFACES-JOUEUR");
         this.initiSimple();
         this.setLayout(new BorderLayout());
         this.initialise();
@@ -111,9 +111,16 @@ public class JoueurGUI extends JFrame implements  ActionListener{
                 this.tab[i][j].setOpaque(true);
                 this.panelGrille.add(tab[i][j]); // ajouter au Panel
                 this.tab[i][j].setOpaque(true);
-                this.tab[i][j].setHorizontalAlignment(SwingConstants.CENTER); // pour
-                // tab[colonne][ligne].addMouseListener((MouseListener) ); // ajouter l'��couteur aux
+                this.tab[i][j].setHorizontalAlignment(SwingConstants.CENTER);  // tab[colonne][ligne].addMouseListener((MouseListener) ); // ajouter l'��couteur aux
                 if(j==0 && i==0){
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(i==0){
+                    this.tab[i][j].setText(j+"");
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(j==0){
+                    this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
                 }
                 else{
@@ -369,6 +376,13 @@ public class JoueurGUI extends JFrame implements  ActionListener{
                 this.tab[i][j].setHorizontalAlignment(SwingConstants.CENTER); // pour
                 // tab[colonne][ligne].addMouseListener((MouseListener) ); // ajouter l'��couteur aux
                 if(j==0 && i==0){
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(i==0){
+                    this.tab[i][j].setText(j+"");
+                    this.tab[i][j].setBackground(Color.white);
+                }
+                else if(j==0){
                     this.tab[i][j].setText(i+"");
                     this.tab[i][j].setBackground(Color.white);
                 }
