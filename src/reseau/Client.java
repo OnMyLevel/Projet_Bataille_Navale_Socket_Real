@@ -20,11 +20,9 @@ public class Client  {
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
-
 
     public Client(String server, int port, String username) {
         this.server = server;
@@ -39,14 +37,13 @@ public class Client  {
             socket = new Socket(server, port);
         }
         catch(Exception ec) {
-            display("Error connectiong to server:" + ec);
+            display("Erreur de connexion au serveur:" + ec);
             return false;
         }
 
-        String msg = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
+        String msg = "Connexion accepter " + socket.getInetAddress() + ":" + socket.getPort();
         display(msg);
 
-        /* Creating both Data Stream */
         try
         {
             sInput  = new ObjectInputStream(socket.getInputStream());
@@ -57,10 +54,8 @@ public class Client  {
             return false;
         }
 
-        // creates the Thread to listen from the server
         new ListenFromServer().start();
-        // Send our username to the server this is the only message that we
-        // will send as a String. All other messages will be ChatMessage objects
+
         try
         {
             sOutput.writeObject(username);
@@ -70,22 +65,15 @@ public class Client  {
             disconnect();
             return false;
         }
-        // success we inform the caller that it worked
         return true;
     }
 
-    /*
-     * To send a message to the console
-     */
+    //message console
     private void display(String msg) {
-
         System.out.println(msg);
-
     }
 
-    /*
-     * To send a message to the server
-     */
+    //pour envoyer un msg au serveur
     public void sendMessage(ChatMessage msg) {
         try {
             sOutput.writeObject(msg);
@@ -95,10 +83,6 @@ public class Client  {
         }
     }
 
-    /*
-     * When something goes wrong
-     * Close the Input/Output streams and disconnect
-     */
     private void disconnect() {
         try {
             if(sInput != null) sInput.close();
@@ -114,17 +98,6 @@ public class Client  {
         catch(Exception e) {}
 
     }
-    /*
-     * To start the Client in console mode use one of the following command
-     * > java Client
-     * > java Client username
-     * > java Client username portNumber
-     * > java Client username portNumber serverAddress
-     * at the console prompt
-     * If the portNumber is not specified 1500 is used
-     * If the serverAddress is not specified "localHost" is used
-     * If the username is not specified "Anonymous" is used
-     */
 
     void getMessage (){
         try {
@@ -137,15 +110,14 @@ public class Client  {
         return;
     }
     public static void main(String[] args) {
-        // default values if not entered
+
         int portNumber = 1500;
         String serverAddress = "localhost"; //192.168.20.31
         String userName = "Anonymous";
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("Enter the username: ");
+        System.out.println("Entrez votre login: ");
         userName = scan.nextLine();
-
         // different case according to the length of the arguments.
         switch(args.length) {
             case 3:
@@ -172,19 +144,20 @@ public class Client  {
                 System.out.println("Usage is: > java Client [username] [portNumber] [serverAddress]");
                 return;
         }
-        // create the Client object
+
+        // creation Client object
         Client client = new Client(serverAddress, portNumber, userName);
-        // try to connect to the server and return if not connected
+        // essai de connecter au server et return si ce n'est pas connecter
         if(!client.start())
             return;
 
-        System.out.println("\nHello.! Welcome to the chatroom.");
+        System.out.println("\nBonjour ! Bienvenue dans Bataille Navale 2000.");
         //client.getMessage();
 
-        // infinite loop to get the input from the user
+        //Boucle infini pour lire ce qu'écrit le client
         while(true) {
             System.out.print("> ");
-            // read message from user
+            //read les messages des clients
             String msg = scan.nextLine();
 
             if(msg.equalsIgnoreCase("LOGOUT")) {
@@ -275,28 +248,21 @@ public class Client  {
                 client.sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
             }
         }
-        // close resource
         scan.close();
-        // client completed its job. disconnect client.
         client.disconnect();
     }
 
-    /*
-     * a class that waits for the message from the server
-     */
     class ListenFromServer extends Thread {
 
         public void run() {
             while(true) {
                 try {
-                    // read the message form the input datastream
                     String msg = (String) sInput.readObject();
-                    // print the message
                     System.out.println(msg);
                     System.out.print("> ");
                 }
                 catch(IOException e) {
-                    display(notif + "Server has closed the connection: " + e + notif);
+                    display(notif + "Serveur a fermer la connexion: " + e + notif);
                     break;
                 }
                 catch(ClassNotFoundException e2) {
