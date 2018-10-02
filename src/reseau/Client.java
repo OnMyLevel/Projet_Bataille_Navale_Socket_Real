@@ -144,7 +144,6 @@ public class Client  {
                 System.out.println("Usage is: > java Client [username] [portNumber] [serverAddress]");
                 return;
         }
-
         // creation Client object
         Client client = new Client(serverAddress, portNumber, userName);
         // essai de connecter au server et return si ce n'est pas connecter

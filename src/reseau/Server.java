@@ -239,7 +239,7 @@ public class Server {
                 sInput = new ObjectInputStream(socket.getInputStream());
                 // read the username
                 username = (String) sInput.readObject();
-                broadcast(notif + username + " a rejoin Bataille Navale 2000" + notif);
+                broadcast(notif + username + " a rejoint Bataille Navale 2000" + notif);
             } catch (IOException e) {
                 display("Exception creating new Input/output Streams: " + e);
                 return;
