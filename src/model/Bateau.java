@@ -8,10 +8,12 @@ public class Bateau {
     private boolean vertical;
 
     public Element[] getElement() {
+
         return element;
     }
 
     public void setElement(Element[] element) {
+
         this.element = element;
     }
 
@@ -49,11 +51,19 @@ public class Bateau {
         return a;
     }
 
+    public boolean isVertical() {
+        return vertical;
+    }
+
+    public void setVertical(boolean vertical) {
+        this.vertical = vertical;
+    }
+
     public boolean estdetruit(){
         boolean res=true;
         int i=0;
         while((i<element.length)&&res){
-            res=(res)&&(element[i].toString() == " ! ");
+            res=(res)&&(element[i].toString() == " * ");
             i++;
         }
         return res;
@@ -72,6 +82,9 @@ public class Bateau {
         return s;
     }
 
+    public boolean getPlace(){
+        return this.vertical;
+    }
 
 
 }

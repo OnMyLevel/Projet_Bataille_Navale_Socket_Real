@@ -17,36 +17,44 @@ public class Game {
     private int ancienNombreJoueur;
 
     public String getMesssageAttaque() {
+
         return messsageAttaque;
     }
 
     public void setMesssageAttaque(String messsageAttaque) {
+
         this.messsageAttaque = messsageAttaque;
     }
 
     private String messsageAttaque;
 
     public int getProchainJoueur() {
+
         return prochainJoueur;
     }
 
     public void setProchainJoueur(int prochainJoueur) {
+
         this.prochainJoueur = prochainJoueur;
     }
 
     private String messageAttaque;
 
     public int getAncienNombreJoueur() {
+
         return ancienNombreJoueur;
     }
     public String getMessageAttaque() {
+
         return messageAttaque;
     }
     public void setMessageAttaque(String messageAttaque) {
+
         this.messageAttaque = messageAttaque;
     }
 
     public void setAncienNombreJoueur(int ancienNombreJoueru) {
+
         this.ancienNombreJoueur = ancienNombreJoueru;
     }
 
@@ -64,22 +72,27 @@ public class Game {
     }
 
     public void setJoueurs(ArrayList<Joueur> joueurs) {
+
         this.joueurs = joueurs;
     }
 
     public Flotte getFlotte() {
+
         return flotte;
     }
 
     public void setFlotte(Flotte flotte) {
+
         this.flotte = flotte;
     }
 
     public int getScore() {
+
         return score;
     }
 
     public void setScore(int score) {
+
         this.score = score;
     }
 
@@ -276,7 +289,7 @@ public class Game {
             for(int i=0;i< this.joueurs.size();i++){
                 Addresse tmp = this.joueurs.get(i).lanceAttaque();
                 point = this.lanceAttaque(this.joueurs.get(i).lanceAttaque());
-                if(point==1){
+                if(point == 1){
                     this.getJoueurs().get(i).setScore( this.getJoueurs().get(i).getScore()+1);
                     this.getJoueurs().get(i).getMapsJoueur().setElementT(new Element(tmp.getAdrLigne(),tmp.getAdrColone(),"abime"),tmp);
                 }
@@ -293,8 +306,6 @@ public class Game {
         a +=this.getFlotte().afficheFlotte().toString();
         return a;
     }
-
-
 
     public void ajouerJoueur(Joueur a){
         this.getJoueurs().add(a);

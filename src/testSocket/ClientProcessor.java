@@ -30,6 +30,14 @@ public class ClientProcessor implements Runnable{
         sock = pSock;
     }
 
+    public Game getRealGame() {
+        return realGame;
+    }
+
+    public void setRealGame(Game realGame) {
+        this.realGame = realGame;
+    }
+
     //Le traitement lancé dans un thread séparé
     public void run(){
         System.err.println("Lancement du traitement de la connexion cliente");
@@ -88,6 +96,24 @@ public class ClientProcessor implements Runnable{
                             realGame.getFlotte().getMaps().setElementT(new Element(" * "),new Addresse(x,y));
                             toSend = "1, Toucher ! \n ";
                             realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore() + 1);
+                            score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
+                            realGame.setMessageAttaque(toSend);
+                            if (realGame.getProchainJoueur() == realGame.getJoueurs().size() - 1) {
+                                realGame.setProchainJoueur(0);
+                            } else {
+                                if (realGame.getJoueurs().size() == 1) {
+                                    realGame.setProchainJoueur(0);
+                                } else {
+                                    realGame.setProchainJoueur(joueur.getIdGame() + 1);
+                                }
+                            }
+                            toSend += "Prochain joueur, " + realGame.getProchainJoueur();
+                            break;
+                        case 2:
+                            System.out.println("Couller");
+                            realGame.getFlotte().getMaps().setElementT(new Element(" ! "),new Addresse(x,y));
+                            toSend = "3, Couller"+realGame.getFlotte().getBateauDetruis().getClass()+","+realGame.getFlotte().getBateauDetruis().getPlace()+", Couler ! \n ";
+                            realGame.getJoueurs().get(joueur.getIdGame()).setScore(realGame.getJoueurs().get(joueur.getIdGame()).getScore() + 3);
                             score = realGame.getJoueurs().get(joueur.getIdGame()).getScore();
                             realGame.setMessageAttaque(toSend);
                             if (realGame.getProchainJoueur() == realGame.getJoueurs().size() - 1) {

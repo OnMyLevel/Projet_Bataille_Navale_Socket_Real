@@ -42,6 +42,16 @@ public class AdminGUI extends JFrame implements  ActionListener{
     private JButton   lancerPartie;
     private JTextArea infoGenerale;
 
+    public String getAncienCoord() {
+        return ancienCoord;
+    }
+
+    public void setAncienCoord(String ancienCoord) {
+        this.ancienCoord = ancienCoord;
+    }
+
+    private String ancienCoord;
+
 
     public AdminGUI(String titre, int x, int y, int w, int h, Game moteurJeu) {
 
@@ -64,7 +74,6 @@ public class AdminGUI extends JFrame implements  ActionListener{
     }
 
     public AdminGUI() {
-
         super("BATAILLE-NAVALE-INTERFACES-ADMIN");
         this.initGame();
         this.setLayout(new BorderLayout());
@@ -104,6 +113,7 @@ public class AdminGUI extends JFrame implements  ActionListener{
         //J'attribue la couleur aux JLabels
         for (int i = 0; i < this.server.getRealGame().getFlotte().getMaps().TAILLELIGNE; i++) {
             for (int j = 0; j < this.server.getRealGame().getFlotte().getMaps().TAILLECOLONNE; j++) {
+
                 this.tab[i][j] = new JLabel(); // cr��ation du JLabel
                 this.tab[i][j].setOpaque(true);
                 this.panelGrille.add(tab[i][j]); // ajouter au Panel
@@ -138,10 +148,11 @@ public class AdminGUI extends JFrame implements  ActionListener{
                         this.tab[i][j].setText(i+","+j);
                     }
                }
+
                 // create a line border with the specified color and width
                 Border border = BorderFactory.createLineBorder(Color.black, 1);
                 this.tab[i][j].setBorder(border);
-              //  this.tab[i][j].addMouseListener(new LabelAdapter());
+                // this.tab[i][j].addMouseListener(new LabelAdapter());
             }
 
         }
@@ -312,8 +323,8 @@ public class AdminGUI extends JFrame implements  ActionListener{
 
         public void actionPerformed(ActionEvent e) {
             System.out.println("Valider Placement");
-            if (getCoord.toString() != null) {
-
+            if (getCoord.toString() != null && getCoord.getText().compareTo(getAncienCoord())!=0) {
+                setAncienCoord(getCoord.getText());
                 String[] a = getCoord.getText().split(",");
                 System.out.println(a[0].toString());
                 int x = Integer.valueOf(a[0]);
@@ -561,7 +572,7 @@ public class AdminGUI extends JFrame implements  ActionListener{
                         // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.black);
-                        //this.tab[i][j].setText(i+","+j);
+                        this.tab[i][j].setText(i+","+j);
                     }
                     else {
                         this.tab[i][j].setText(this.server.getRealGame().getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());

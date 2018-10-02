@@ -43,13 +43,21 @@ public class Element {
                 this.modif=" * ";
                 System.out.println("toucher");
                 a=true;
-            }else if(etat=="abime")
-                etat="detruit";
-                this.modif=" ! ";
-                a=true;
+            }if(etat=="detruuit"){
+                System.out.println("Déjà détruit");
+            }else{
+                System.out.println("Déjà abimé");
+            }
         }
         return a;
     }
+
+    public boolean detruit(){
+        this.setEtat("detruit");
+        this.modif=" ! ";
+        return true;
+    }
+
     public void avancer(int i,int j){
         if((i>=-1) && (i<=1) && (j>=-1) && (j<=1)){
             this.adr.setAdrLigne(this.adr.getAdrLigne()+i);

@@ -131,7 +131,12 @@ public class JoueurGUI extends JFrame implements  ActionListener{
                     }
                     else if(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString()==" * ") {
                         this.tab[i][j].setText(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString());
-                        this.tab[i][j].setBackground(Color.magenta);
+                        this.tab[i][j].setBackground(Color.yellow);
+                        this.tab[i][j].setText(i+","+j);
+                    }
+                    else if(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString()==" ! ") {
+                        this.tab[i][j].setText(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString());
+                        this.tab[i][j].setBackground(Color.green);
                         this.tab[i][j].setText(i+","+j);
                     }
                     else {
@@ -338,14 +343,16 @@ public class JoueurGUI extends JFrame implements  ActionListener{
     }
 
     public void gameRerefresh(){
+          System.out.println(client.getToucher()+ " lalala ");
         if(client.getToucher()==1){
-            System.out.println("ici 4");
             client.getJoueur().setScore(client.getJoueur().getScore()+1);
             client.getJoueur().getMapsJoueur().SuprimerE(new Addresse(exX,exY));
             client.getJoueur().getMapsJoueur().PlacerElement2(new Element(" X "),new Addresse(exX,exY));
-        }else{
+        }if(client.getToucher()==3){
+            client.getJoueur().setScore(client.getJoueur().getScore()+3);
+           // switch (client.)
             client.getJoueur().getMapsJoueur().SuprimerE(new Addresse(exX,exY));
-            client.getJoueur().getMapsJoueur().PlacerElement2(new Element(" # "),new Addresse(exX,exY));
+            client.getJoueur().getMapsJoueur().PlacerElement2(new Element(" ! "),new Addresse(exX,exY));
         }
     }
 
@@ -403,7 +410,7 @@ public class JoueurGUI extends JFrame implements  ActionListener{
                         // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());
                         this.tab[i][j].setText(" ");
                         this.tab[i][j].setBackground(Color.green);
-                        //this.tab[i][j].setText(i+","+j);
+                        this.tab[i][j].setText(i+","+j);
                     }
                     else if(this.client.getJoueur().getMapsJoueur().getElementT(new Addresse(i, j)).toString()==" X ") {
                         // this.tab[i][j].setText(moteurJeu.getFlotte().getMaps().getElementT(new Addresse(i, j)).toString());

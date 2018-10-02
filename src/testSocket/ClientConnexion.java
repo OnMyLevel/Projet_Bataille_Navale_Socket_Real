@@ -1,6 +1,7 @@
 package testSocket;
 
 import game.Joueur;
+import model.Bateau;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,6 +23,15 @@ public class ClientConnexion implements Runnable{
     private static int count = 0;
     private String name = "Player-";
     private String coorAttaque;
+    private Bateau Btocuher;
+
+    public Bateau getBtocuher() {
+        return Btocuher;
+    }
+
+    public void setBtocuher(Bateau btocuher) {
+        Btocuher = btocuher;
+    }
 
     public int getToucher() {
         return toucher;
@@ -102,13 +112,19 @@ public class ClientConnexion implements Runnable{
                     String response = read();
                     this.setRetourAttaque(response);
                     String[] tab = response.split(",");
-                    System.out.println(" ICI");
-                    System.out.println(tab[0]);
                     if(tab[0].compareTo("1")==0) {
-                        this.setToucher(Integer.valueOf(tab[0]));
+                        this.setToucher(1);
                         System.out.println("\t * : " + " Réponse reçue " + "\n " + response);
-                    }else{
-                        this.setToucher(Integer.valueOf(tab[0]));
+                    }
+                    if(tab[0].compareTo("2")==0) {
+                        System.out.println(" ICI LLALLA");
+                        System.out.println(tab[0]);
+                       // this.setBtocuher();
+                      this.setToucher(3);
+                      System.out.println("\t * : " + " Réponse reçue " + "\n " + response);
+                    }
+                    else{
+                        this.setToucher(0);
                         System.out.println("\t * : " + " Réponse reçue " + "\n " + response);
                     }
                }

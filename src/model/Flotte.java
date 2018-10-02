@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.lang.Math;
+import java.util.Scanner;
 
 public class Flotte {
 
@@ -14,6 +15,7 @@ public class Flotte {
     public static final int PORTEAVIONS_TAILLE = 5;
 
     public ArrayList<Bateau> compBateau;
+    public Bateau bateauDetruis;
     public boolean flotteDet;
     public Carte maps;
 
@@ -186,23 +188,39 @@ public class Flotte {
             for (int j = 0; j < this.compBateau.get(i).getElement().length;j++) {
                 if (this.compBateau.get(i).getElement()[j].toucheR(t)) {
                     System.out.println("Vous avez toucher un bateau à l'adresse  " + t.toString() + "");
-                    return 1;
+                    //return 1;
                 }
             }
             i++;
         }
          if(this.bateauDetruit()==2){
+             System.out.println(" his.bateauDetruit()==2 ");
              return 2;
         }else {
              return 0;
          }
     }
 
+    public Bateau getBateauDetruis() {
+        return bateauDetruis;
+    }
+
+    public void setBateauDetruis(Bateau bateauDetruis) {
+        this.bateauDetruis = bateauDetruis;
+    }
+
     public int  bateauDetruit() {
+        System.out.println(" bateauDetruit()  ");
         for (int i = 0; i < this.compBateau.size(); i++) {
             if (this.compBateau.get(i).estdetruit()){
-                System.out.println("Le bateaut "+this.compBateau.get(i).getClass()+" a été détruit ");
-                return 2;
+                System.out.println("Le bateaut "+this.compBateau.get(i).getClass()+" a été détruit 1");
+                for(int j =0; j< this.compBateau.get(i).getElement().length;j++){
+                    System.out.println("Le bateaut "+this.compBateau.get(i).getClass()+" a été détruit 1");
+                    this.compBateau.get(i).getElement()[j].detruit();
+                    this.setBateauDetruis(this.compBateau.get(i));
+                    this.compBateau.remove(i);
+                    return  2;
+                }
             }
         }
         return 1;
@@ -315,7 +333,7 @@ public class Flotte {
         String s = new String();
         for(int i=0;i< this.compBateau.size();i++) {
             s+= this.compBateau.get(i).toString();
-            //sSystem.out.println(this.compBateau.get(i).toString());
+            System.out.println(this.compBateau.get(i).toString());
         }
         return s;
     }
@@ -335,5 +353,21 @@ public class Flotte {
         System.out.println(a.placeBateauAle());
         a.afficheCarte();
         a.afficheFlotte();
+        a.afficheCarte();
+        a.afficheFlotte();
+        System.out.println("Tapez vos coordonées");
+        System.out.println(" Tapez les coordonées de la case \n ");
+        Scanner sc = new Scanner(System.in);
+        String b = sc.next();
+        String[] tab = b.split(",");
+        System.out.println("LANCE ATTTAQUE");
+        System.out.println(tab[0]);
+        System.out.println(tab[1]);
+        int x = Integer.valueOf(tab[0]);
+        int y = Integer.valueOf(tab[1]);
+        a.adrToucher( new Addresse(x,y));
+        a.afficheCarte();
+        a.afficheFlotte();
+        System.out.println(a.getBateauDetruis().getClass());
     }
 }
